@@ -35,7 +35,7 @@ public:
 	virtual ~SqMatrix();
 
 	double determinant();
-	SqMatrix minor(int row, int col);
+	SqMatrix minorMat(int row, int col);
 	SqMatrix inverse();
 
 	SqMatrix& operator*=(const SqMatrix&);

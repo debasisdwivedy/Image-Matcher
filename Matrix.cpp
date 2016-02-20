@@ -12,6 +12,7 @@ Matrix::Matrix(int r, int c):rows(r), cols(c) {
 Matrix::Matrix(const Matrix& mat):rows(mat.rows), cols(mat.cols) {
 	arr = new double*[rows];
 	for (int i=0; i<rows; i++) {
+		arr[i] = new double[cols];
 		std::memcpy(arr[i], mat.arr[i], cols*sizeof(arr[i][0]));
 	}
 }
@@ -26,6 +27,7 @@ Matrix& Matrix::operator=(const Matrix& mat) {
 
 	arr = new double*[rows];
 	for (int i=0; i<rows; i++) {
+		arr[i] = new double[cols];
 		std::memcpy(arr[i], mat.arr[i], cols*sizeof(arr[i][0]));
 	}
 	rows = mat.rows;
@@ -87,13 +89,12 @@ double SqMatrix::determinant() {
 	float det = 0;
 	
 	for (int i=0; i<order; i++) {
-		SqMatrix minor = this->minor(0,i);
-		det += (i%2==1? -1.0: 1.0) * arr[0][i] * minor.determinant();
+		det += (i%2==1? -1.0: 1.0) * arr[0][i] * this->minorMat(0,i).determinant();
 	}
 	return det;
 }
 
-SqMatrix SqMatrix::minor(int row, int col) {
+SqMatrix SqMatrix::minorMat(int row, int col) {
 	/* Reference: https://chi3x10.wordpress.com/2008/05/28/calculate-matrix-inversion-in-c/ */
 	SqMatrix mat(order-1);
 	int curRow = 0, curCol = 0;
@@ -116,10 +117,9 @@ SqMatrix SqMatrix::inverse() {
 	/* Reference: https://chi3x10.wordpress.com/2008/05/28/calculate-matrix-inversion-in-c/ */
 	SqMatrix inv(order);
 	double det = determinant();
-	std::cout<<"Determinant: "<<det<<std::endl;
 	for (int i=0; i<order; i++) {
 		for (int j=0; j<order; j++) {
-			inv.arr[j][i] = minor(i,j).determinant() * ((i+j)%2 == 1 ? -1.0 : 1.0) / det;
+			inv.arr[j][i] = minorMat(i,j).determinant() * ((i+j)%2 == 1 ? -1.0 : 1.0) / det;
 		}
 	}
 	return inv;
