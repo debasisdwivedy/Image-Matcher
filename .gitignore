@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+#Custom
+*.swp
+*.swo
+.depend
+a2
