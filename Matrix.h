@@ -1,8 +1,6 @@
 #ifndef __MAdoubleRIX_H__
 #define __MAdoubleRIX_H__
 
-#include <iostream>
-
 class Matrix {
 protected:
 	double** arr;
@@ -34,11 +32,14 @@ public:
 	SqMatrix& operator=(const SqMatrix&);
 	virtual ~SqMatrix();
 
-	double determinant();
-	SqMatrix minorMat(int row, int col);
-	SqMatrix inverse();
+	double determinant() const;
+	SqMatrix minorMat(int row, int col) const;
+	SqMatrix inverse() const;
+	SqMatrix transpose() const;
 
 	SqMatrix& operator*=(const SqMatrix&);
+
+	static SqMatrix identity(int);
 };
 
 Matrix operator*(const Matrix&, const Matrix&);

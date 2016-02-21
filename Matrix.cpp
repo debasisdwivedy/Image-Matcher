@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 
 #include "Matrix.h"
 
@@ -79,10 +80,10 @@ SqMatrix& SqMatrix::operator=(const SqMatrix& mat) {
 }
 
 SqMatrix::~SqMatrix() {
-	
+
 }
 
-double SqMatrix::determinant() {
+double SqMatrix::determinant() const {
 	/* Reference: https://chi3x10.wordpress.com/2008/05/28/calculate-matrix-inversion-in-c/ */
 	if(order == 1)
 		return arr[0][0];
@@ -94,7 +95,7 @@ double SqMatrix::determinant() {
 	return det;
 }
 
-SqMatrix SqMatrix::minorMat(int row, int col) {
+SqMatrix SqMatrix::minorMat(int row, int col) const {
 	/* Reference: https://chi3x10.wordpress.com/2008/05/28/calculate-matrix-inversion-in-c/ */
 	SqMatrix mat(order-1);
 	int curRow = 0, curCol = 0;
@@ -113,7 +114,7 @@ SqMatrix SqMatrix::minorMat(int row, int col) {
 	return mat;
 }
 
-SqMatrix SqMatrix::inverse() {
+SqMatrix SqMatrix::inverse() const {
 	/* Reference: https://chi3x10.wordpress.com/2008/05/28/calculate-matrix-inversion-in-c/ */
 	SqMatrix inv(order);
 	double det = determinant();
@@ -123,6 +124,16 @@ SqMatrix SqMatrix::inverse() {
 		}
 	}
 	return inv;
+}
+
+SqMatrix SqMatrix::transpose() const {
+	SqMatrix result(order);
+	for (int i=0; i<order; i++) {
+		for (int j=0; j<order; j++) {
+			result(j,i) = arr[i][j];
+		}
+	}
+	return result;
 }
 
 SqMatrix& SqMatrix::operator*=(const SqMatrix& mat) {
@@ -150,4 +161,15 @@ SqMatrix operator*(const SqMatrix& s1, const SqMatrix& s2) {
 	SqMatrix res(s1);
 	res *= s2;
 	return res;
+}
+
+
+SqMatrix SqMatrix::identity(int order) {
+	SqMatrix result(order);
+	for (int i=0; i<order; i++) {
+		for (int j=0; j<order; j++) {
+			result(i,j) = i==j;
+		}
+	}
+	return result;
 }

@@ -3,7 +3,7 @@
 BIN = a2
 
 # Define source files
-SRCS = ./Matrix.cpp ./siftpp/sift.cpp ./a2.cpp
+SRCS = ./Matrix.cpp ./Transform.cpp ./siftpp/sift.cpp ./a2.cpp
 
 # Define header file paths
 INCPATH = -I. -Isiftpp
