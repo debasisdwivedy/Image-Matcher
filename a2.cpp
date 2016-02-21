@@ -13,10 +13,91 @@
 #include <string>
 #include <vector>
 #include <Sift.h>
+#include <math.h>
 
 //Use the cimg namespace to access the functions easily
 using namespace cimg_library;
 using namespace std;
+
+
+int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DISTANCE  = 100)
+{
+    int matches=0, maxHeight = 0;
+    const unsigned char color[] = {0, 255, 0};
+    
+    CImg<double> greyScale1, greyScale2;
+    
+    // converting the images to grayscale
+    if(input1.spectrum() == 1)  
+        greyScale1 = input1;
+    else    
+        greyScale1 = input1.get_RGBtoHSI().get_channel(2);
+
+    if(input2.spectrum() == 1)
+    	greyScale2 = input2;
+    else
+	    greyScale2 = input2.get_RGBtoHSI().get_channel(2); 
+    
+    vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
+    vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
+    
+    
+    // creating a merged image using the two images
+    maxHeight = max(input1.height(),input2.height());
+
+    CImg<double> output(input1.width() + input2.width(), maxHeight, 1, input1.spectrum(), 0);
+
+	// first image on the left of the merged image
+	for(int i = 0; i < input1.width(); i++)
+	{
+		for(int j = 0; j < input1.height(); j++)
+		{
+	        for(int k = 0; k < input1.spectrum(); k++)
+			{
+			    output(i, j, 0, k) = input1(i, j, 0, k);                    
+			}
+		}
+	}
+
+	// second image on the right of the merged image
+	for(int i = input1.width(); i < output.width(); i++)
+	{
+		for(int j = 0; j < input2.height(); j++)
+		{
+	        for(int k = 0; k < input2.spectrum(); k++)
+			{
+			    output(i, j, 0, k) = input2(i - input1.width(), j, 0, k);                    
+			}
+		}
+	}
+    
+    
+    // matching both the descriptors and obtaining the number of matches
+    for(int i = 0; i < desc1.size(); i++)
+    {
+        for(int j = 0; j < desc2.size(); j++)
+        {
+            double sum = 0;
+
+            for(int k = 0; k < 128; k++)
+            {
+                sum += pow((desc1[i].descriptor[k]-desc2[j].descriptor[k]),2);
+            }
+            
+            sum = sqrt(sum);
+
+            if(sum < MINIMUM_SIFT_DISTANCE)
+            {
+                output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
+                matches++;
+            }
+        }
+    }
+    
+    output.save("sift.png");
+    
+    return matches; 
+}
 
 
 int main(int argc, char **argv)
@@ -33,34 +114,21 @@ int main(int argc, char **argv)
     string part = argv[1];
     string inputFile = argv[2];
 
+    // Sift detector
     if(part == "part1")
-      {
-	// This is just a bit of sample code to get you started, to
-	// show how to use the SIFT library.
+    {
+	   if(argc < 4)
+        {
+            cout << "Insufficent number of arguments." << endl;
+            return -1;
+        }
 
-	CImg<double> input_image(inputFile.c_str());
+        CImg<double> input1(argv[2]);
+        CImg<double> input2(argv[3]);
 
-	// convert image to grayscale
-	CImg<double> gray = input_image.get_RGBtoHSI().get_channel(2);
-		vector<SiftDescriptor> descriptors = Sift::compute_sift(gray);
-
-	for(int i=0; i<descriptors.size(); i++)
-	  {
-	    cout << "Descriptor #" << i << ": x=" << descriptors[i].col << " y=" << descriptors[i].row << " descriptor=(";
-	    for(int l=0; l<128; l++)
-	      cout << descriptors[i].descriptor[l] << "," ;
-	    cout << ")" << endl;
-
-	    for(int j=0; j<5; j++)
-	      for(int k=0; k<5; k++)
-		if(j==2 || k==2)
-		  for(int p=0; p<3; p++)
-		    input_image(descriptors[i].col+k, descriptors[i].row+j, 0, p)=0;
-
-	  }
-
-	input_image.get_normalize(0,255).save("sift.png");
-      }
+        double matches=sift_matching(input1, input2);
+        cout<<matches<<endl;            
+    }
     else if(part == "part2")
       {
 	// do something here!
