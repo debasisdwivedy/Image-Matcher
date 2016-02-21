@@ -19,8 +19,37 @@
 using namespace cimg_library;
 using namespace std;
 
+// holds the name of the image file and the matching score of sift descriptors
+class Image
+{
+    public:
 
-int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DISTANCE  = 100)
+    string name;
+    int count; 
+
+    void setParameters(string name, int count)
+    {
+        this->name = name;
+        this->count = count;
+    }
+
+    int getCount()
+    {
+        return count;
+    }
+
+    string getName()
+    {
+        return name;
+    }
+
+    bool operator < (const Image& i1) const
+    {
+        return count > i1.count;
+    }
+};
+
+int sift_matching(CImg<double> input1, CImg<double> input2, string part, int MINIMUM_SIFT_DISTANCE  = 100)
 {
     int matches=0, maxHeight = 0;
     const unsigned char color[] = {0, 255, 0};
@@ -36,7 +65,7 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
     if(input2.spectrum() == 1)
     	greyScale2 = input2;
     else
-	greyScale2 = input2.get_RGBtoHSI().get_channel(2); 
+	    greyScale2 = input2.get_RGBtoHSI().get_channel(2); 
     
     vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
     vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
@@ -47,30 +76,33 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
 
     CImg<double> output(input1.width() + input2.width(), maxHeight, 1, input1.spectrum(), 0);
 
-	// first image on the left of the merged image
-	for(int i = 0; i < input1.width(); i++)
-	{
-		for(int j = 0; j < input1.height(); j++)
-		{
-		        for(int k = 0; k < input1.spectrum(); k++)
-			{
-			    output(i, j, 0, k) = input1(i, j, 0, k);                    
-			}
-		}
-	}
 
-	// second image on the right of the merged image
-	for(int i = input1.width(); i < output.width(); i++)
-	{
-		for(int j = 0; j < input2.height(); j++)
-		{
-		        for(int k = 0; k < input2.spectrum(); k++)
-			{
-			    output(i, j, 0, k) = input2(i - input1.width(), j, 0, k);                    
-			}
-		}
-	}
-    
+	// first image on the left of the merged image
+	if(part == "part1.1")
+    {
+        for(int i = 0; i < input1.width(); i++)
+    	{
+    		for(int j = 0; j < input1.height(); j++)
+    		{
+    	        for(int k = 0; k < input1.spectrum(); k++)
+    			{
+    			    output(i, j, 0, k) = input1(i, j, 0, k);                    
+    			}
+    		}
+    	}
+
+    	// second image on the right of the merged image
+    	for(int i = input1.width(); i < output.width(); i++)
+    	{
+    		for(int j = 0; j < input2.height(); j++)
+    		{
+    	        for(int k = 0; k < input2.spectrum(); k++)
+    			{
+    			    output(i, j, 0, k) = input2(i - input1.width(), j, 0, k);                    
+    			}
+    		}
+    	}
+    }
     
     // matching both the descriptors and obtaining the number of matches
     for(int i = 0; i < desc1.size(); i++)
@@ -88,14 +120,21 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
 
             if(sum < MINIMUM_SIFT_DISTANCE)
             {
-                output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
+                if(part == "part1.1")
+                {
+                    output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
+                }
                 matches++;
             }
         }
     }
     
-    output.save("sift.png");
-    
+    // saving the sift output to a image file
+    if(part == "part1.1") 
+    {
+        output.save("sift.png");
+    }
+
     return matches; 
 }
 
@@ -112,10 +151,9 @@ int main(int argc, char **argv)
       }
 
     string part = argv[1];
-    string inputFile = argv[2];
 
     // Sift detector
-    if(part == "part1")
+    if(part == "part1.1")
     {
 	   if(argc < 4)
         {
@@ -126,8 +164,40 @@ int main(int argc, char **argv)
         CImg<double> input1(argv[2]);
         CImg<double> input2(argv[3]);
 
-        double matches=sift_matching(input1, input2);
-        cout<<matches<<endl;            
+        double matches = sift_matching(input1, input2, part);
+        cout<<"The Number of Sift Matches: "<<matches<<endl;            
+    }
+    else if(part == "part1.2")
+    {
+        if(argc < 4)
+        {
+            cout << "Insufficent number of arguments." << endl;
+            return -1;
+        }
+
+        CImg<double> input(argv[2]);
+
+        // creating a vector to store the sift matches for each of the image
+        vector<Image> images;
+
+        // take in all the images from the cammand line and calculate sift matches of the descriptors
+        for(int i=3; i<argc; i++)
+        {
+                CImg<double> img(argv[i]);
+                Image I;
+                I.setParameters(argv[i], sift_matching(input, img, part));
+                images.push_back(I);
+        } 
+
+        // sort according to the sift match count 
+        std::sort(images.begin(), images.end());
+
+        // printing the results
+        cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name: \t\t"<<"Count: "<<endl;
+        for(int i = 0; i < images.size(); i++)
+        {
+            cout<<images[i].getName()<<"\t\t  "<<images[i].getCount()<<endl;
+        }
     }
     else if(part == "part2")
       {
@@ -143,3 +213,11 @@ int main(int argc, char **argv)
     cerr << "Error: " << err << endl;
   }
 }
+
+
+
+
+
+
+
+
