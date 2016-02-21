@@ -36,7 +36,7 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
     if(input2.spectrum() == 1)
     	greyScale2 = input2;
     else
-	    greyScale2 = input2.get_RGBtoHSI().get_channel(2); 
+	greyScale2 = input2.get_RGBtoHSI().get_channel(2); 
     
     vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
     vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
@@ -52,7 +52,7 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
 	{
 		for(int j = 0; j < input1.height(); j++)
 		{
-	        for(int k = 0; k < input1.spectrum(); k++)
+		        for(int k = 0; k < input1.spectrum(); k++)
 			{
 			    output(i, j, 0, k) = input1(i, j, 0, k);                    
 			}
@@ -64,7 +64,7 @@ int sift_matching(CImg<double> input1, CImg<double> input2, int MINIMUM_SIFT_DIS
 	{
 		for(int j = 0; j < input2.height(); j++)
 		{
-	        for(int k = 0; k < input2.spectrum(); k++)
+		        for(int k = 0; k < input2.spectrum(); k++)
 			{
 			    output(i, j, 0, k) = input2(i - input1.width(), j, 0, k);                    
 			}
