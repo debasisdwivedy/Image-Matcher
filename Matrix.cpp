@@ -51,7 +51,7 @@ Matrix::~Matrix() {
 	delete[] arr;
 }
 
-void Matrix::print() {
+void Matrix::print() const{
 	for (int i=0; i<rows; i++) {
 		for (int j=0; j<cols; j++) {
 			std::cout<<arr[i][j]<<" ";

@@ -14,11 +14,46 @@ public:
 	Transformation(const SqMatrix&);
 
 	void translate(double, double);
+	void rotate(double);
 
 	Transformation inverse() const;
 	
-	std::pair<double, double> transformCoord(double, double) const;
+	std::pair<double, double> transformCoord(double, double, bool debug=false) const;
 };
+
+template <typename T>
+void interpolate(const cimg_library::CImg<T>& img, double x, double y, T* result) {
+	int x0 = (int)x, y0 = (int)y, x1 = x0 + 1, y1 = y0 + 1;
+	std::pair<int, int> points[4] = {
+		std::make_pair(x0, y0),
+		std::make_pair(x0, y1),
+		std::make_pair(x1, y1),
+		std::make_pair(x1, y0)
+	};
+	std::pair<int, int> pixel_locs[4];
+	for (int i=0; i<4; i++) {
+		int pixelX = points[i].first, pixelY = points[i].second;
+		if (pixelX < 0 || pixelX >= img.width() || pixelY < 0 || pixelY >= img.height()) {
+			if (pixelY < 0)
+				pixelY = -pixelY;
+			else if (y >= img.height())
+				pixelY = 2 * img.height() - pixelY;
+
+			if (pixelX < 0)
+				pixelX = -pixelX;
+			else if (x >= img.width())
+				pixelX = 2 * img.width() - pixelX;
+		}
+		pixel_locs[i] = std::make_pair(pixelX, img.height() - pixelY);
+	}
+	
+	for (int i=0; i<img.spectrum(); i++) {
+		result[i] = (x1-x)*(y1-y)*img(pixel_locs[0].first, pixel_locs[0].second,i) +
+					(x1-x)*(y-y0)*img(pixel_locs[1].first, pixel_locs[1].second,i) +
+					(x-x0)*(y-y0)*img(pixel_locs[2].first, pixel_locs[2].second,i) +
+					(x-x0)*(y1-y)*img(pixel_locs[3].first, pixel_locs[3].second,i);
+	}
+}
 
 template <typename T>
 cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transformation t) {
@@ -28,52 +63,63 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 		std::make_pair(img.height() - 1, 0),
 		std::make_pair(img.height() - 1, img.width() - 1)
 	};
-	std::pair<double, double> mapped[] = {
-		t.transformCoord(corners[0].first, corners[0].second),
-		t.transformCoord(corners[1].first, corners[1].second),
-		t.transformCoord(corners[2].first, corners[2].second),
-		t.transformCoord(corners[3].first, corners[3].second),
-	};
-	double leftMost = std::min(std::min(mapped[0].first, mapped[1].first), 
-								std::min(mapped[2].first, mapped[3].first));
-	double bottomMost = std::min(std::min(mapped[0].second, mapped[1].second),
-								std::min(mapped[2].second, mapped[3].second));
-	t.translate(leftMost < 0 ? -leftMost: 0, bottomMost < 0 ? -bottomMost: 0);
-
 	std::pair<double, double> updated[] = {
-		t.transformCoord(corners[0].first, corners[0].second),
-		t.transformCoord(corners[1].first, corners[1].second),
-		t.transformCoord(corners[2].first, corners[2].second),
-		t.transformCoord(corners[3].first, corners[3].second),
+		t.transformCoord(corners[0].first, corners[0].second, true),
+		t.transformCoord(corners[1].first, corners[1].second, true),
+		t.transformCoord(corners[2].first, corners[2].second, true),
+		t.transformCoord(corners[3].first, corners[3].second, true),
 	};
+#if 0
 	for (int i=0; i<4; i++) {
 		std::cout<<"Corner #"<<i<<": "
 			"("<<corners[i].first<<","<<corners[i].second<<") =>"
-			"("<<mapped[i].first<<","<<mapped[i].second<<") =>"
 			"("<<updated[i].first<<","<<updated[i].second<<")"<<std::endl;
 	}
+#endif
 	double rightMost = std::max(std::max(updated[0].first, updated[1].first),
 								std::max(updated[2].first, updated[3].first));
+	double leftMost = std::min(std::min(updated[0].first, updated[1].first),
+								std::min(updated[2].first, updated[3].first));
 	double topMost = std::max(std::max(updated[0].second, updated[1].second),
 								std::max(updated[2].second, updated[3].second));
+	double bottomMost = std::min(std::min(updated[0].second, updated[1].second),
+								std::min(updated[2].second, updated[3].second));
 
+	double widthMapped = rightMost - leftMost, heightMapped = topMost - bottomMost;
+	//t.translate(-leftMost, -bottomMost);
 	Transformation inverse = t.inverse();
-	cimg_library::CImg<double> result(rightMost,topMost,1,3,0);
-#if 1
-	cimg_forXYC(img, x, y, c) {
-		std::pair<double, double> coord = t.transformCoord(x,y);
-		//std::cout<<"Map: "<<x<<", "<<y<<" => "<<coord.first<<", "<<coord.second<<std::endl;
-		int row = (int)coord.first, col = (int)coord.second;
-		if (row < result.width() && row >= 0 && col >= 0 && col < result.height())
-			result(row, col, c) = img(x, y, c);
+	//cimg_library::CImg<T> result(widthMapped, heightMapped, 1, img.spectrum(),0);
+	cimg_library::CImg<T> result(img.width(), img.height(), 1, img.spectrum(),0);
+	
+#if 0
+	int pixels_mapped = 0;
+	for (int x=0; x<img.width(); x++) {
+		for (int y=0; y<img.height(); y++) {
+			std::pair<double, double> coord = t.transformCoord(x, y);
+			int row = (int)(coord.first + 0.5), col = (int)(coord.second + 0.5);
+			if (row < result.width() && row >= 0 && col >= 0 && col < result.height()) {
+				for (int c=0; c<img.spectrum(); c++) {
+					result(row, result.height() - col, c) = img(x, img.height() - y, c);
+				}
+				pixels_mapped ++;
+			}
+		}
 	}
+	std::cout<<"Pixels mapped: "<<pixels_mapped<<" out of "<<img.width() * img.height()<<std::endl;
 #else
-	cimg_forXYC(result, x, y, c) {
-		std::pair<double, double> coord = inverse.transformCoord(x,y);
-		//std::cout<<"Map: "<<x<<", "<<y<<" => "<<coord.first<<", "<<coord.second<<std::endl;
-		int row = (int)coord.first, col = (int)coord.second;
-		if (row < img.width() && row >= 0 && col >= 0 && col < img.height())
-			result(x,y,c) = img(row, col, c);
+	for (int x=0; x<result.width(); x++) {
+		for (int y=0; y<result.height(); y++) {
+			std::pair<double, double> coord = inverse.transformCoord(x,y);
+			if (coord.first < img.width() && coord.first >= 0 &&
+								coord.second >= 0 && coord.second < img.height()) {
+				T res[5];
+				interpolate(img, coord.first, coord.second, &res[0]);
+				for (int c=0; c<img.spectrum(); c++) {
+					result(x, result.height() - y, c) = res[c];
+				}
+			}
+			//std::cout<<"Retrieving from: "<<coord.first<<", "<<coord.second<<std::endl;
+		}
 	}
 #endif
 	return result;

@@ -20,7 +20,7 @@ public:
 	int colCount() const { return cols; }
 
 
-	void print();
+	void print() const;
 };
 
 class SqMatrix: public Matrix {
