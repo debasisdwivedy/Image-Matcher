@@ -6,14 +6,16 @@
 
 
 //Link to the header file
-#include "CImg.h"
 #include <ctime>
 #include <iostream>
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <Sift.h>
 #include <math.h>
+#include "CImg.h"
+#include "Sift.h"
+#include "Matrix.h"
+#include "Transform.h"
 
 //Use the cimg namespace to access the functions easily
 using namespace cimg_library;
@@ -76,7 +78,6 @@ int sift_matching(CImg<double> input1, CImg<double> input2, string part, int MIN
 
     CImg<double> output(input1.width() + input2.width(), maxHeight, 1, input1.spectrum(), 0);
 
-
 	// first image on the left of the merged image
 	if(part == "part1.1")
     {
@@ -138,86 +139,126 @@ int sift_matching(CImg<double> input1, CImg<double> input2, string part, int MIN
     return matches; 
 }
 
+void img_display(const CImg<double>& img) {
+	cimg_library::CImgDisplay main_disp(img, "temp");
+	while (!main_disp.is_closed() ) 
+		main_disp.wait();
+
+}
+
+int temp() {
+#if 0
+	CImg<double> img("lincoln.png");
+	SqMatrix mat = SqMatrix::identity(3);
+
+	Transformation t(mat);
+	t.translate(30,30);
+	t.rotate(-M_PI/6.0);
+	CImg<double> result(transform_image<double>(img, t));
+	cimg_library::CImgDisplay d1(img, "temp1");
+	cimg_library::CImgDisplay d2(result, "temp2");
+	result.save("result.png");
+
+	while (!d1.is_closed() || !d2.is_closed()) {
+		d1.wait();
+		d2.wait();
+	}
+#else
+	SqMatrix mat(3);
+	mat(0,0) = 0.9;
+	mat(0,1) = 0.258;
+	mat(0,2) = -182;
+	mat(1,0) = -0.153;
+	mat(1,1) = 1.44;
+	mat(1,2) = 58;
+	mat(2,0) = -0.000306;
+	mat(2,1) = 0.000731;
+	mat(2,2) = 1;
+
+	//mat = mat.transpose();
+
+	Transformation t(mat);
+	CImg<double> img("lincoln.png");
+	CImg<double> result = transform_image<double>(img, t);
+	img_display(result);
+
+	return 0;
+#endif
+}
 
 int main(int argc, char **argv)
 {
-  try {
+	return temp();
+	try {
+		if(argc < 2)
+		{
+			cout << "Insufficent number of arguments; correct usage:" << endl;
+			cout << "    a2-p1 part_id ..." << endl;
+			return -1;
+		}
 
-    if(argc < 2)
-      {
-	cout << "Insufficent number of arguments; correct usage:" << endl;
-	cout << "    a2-p1 part_id ..." << endl;
-	return -1;
-      }
+		string part = argv[1];
 
-    string part = argv[1];
+		// Sift detector
+		if(part == "part1.1")
+		{
+			if(argc < 4)
+			{
+				cout << "Insufficent number of arguments." << endl;
+				return -1;
+			}
 
-    // Sift detector
-    if(part == "part1.1")
-    {
-	   if(argc < 4)
-        {
-            cout << "Insufficent number of arguments." << endl;
-            return -1;
-        }
+			CImg<double> input1(argv[2]);
+			CImg<double> input2(argv[3]);
 
-        CImg<double> input1(argv[2]);
-        CImg<double> input2(argv[3]);
+			double matches = sift_matching(input1, input2, part);
+			cout<<"The Number of Sift Matches: "<<matches<<endl;            
+		}
+		else if(part == "part1.2")
+		{
+			if(argc < 4)
+			{
+				cout << "Insufficent number of arguments." << endl;
+				return -1;
+			}
 
-        double matches = sift_matching(input1, input2, part);
-        cout<<"The Number of Sift Matches: "<<matches<<endl;            
-    }
-    else if(part == "part1.2")
-    {
-        if(argc < 4)
-        {
-            cout << "Insufficent number of arguments." << endl;
-            return -1;
-        }
+			CImg<double> input(argv[2]);
 
-        CImg<double> input(argv[2]);
+			// creating a vector to store the sift matches for each of the image
+			vector<Image> images;
 
-        // creating a vector to store the sift matches for each of the image
-        vector<Image> images;
+			// take in all the images from the cammand line and calculate sift matches of the descriptors
+			for(int i=3; i<argc; i++)
+			{
+				CImg<double> img(argv[i]);
+				Image I;
+				I.setParameters(argv[i], sift_matching(input, img, part));
+				images.push_back(I);
+			} 
 
-        // take in all the images from the cammand line and calculate sift matches of the descriptors
-        for(int i=3; i<argc; i++)
-        {
-                CImg<double> img(argv[i]);
-                Image I;
-                I.setParameters(argv[i], sift_matching(input, img, part));
-                images.push_back(I);
-        } 
+			// sort according to the sift match count 
+			std::sort(images.begin(), images.end());
 
-        // sort according to the sift match count 
-        std::sort(images.begin(), images.end());
+			// printing the results
+			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name: \t\t"<<"Count: "<<endl;
+			for(int i = 0; i < images.size(); i++)
+			{
+				cout<<images[i].getName()<<"\t\t  "<<images[i].getCount()<<endl;
+			}
+		}
+		else if(part == "part2")
+		{
+			// do something here!
+		}
+		else
+			throw std::string("unknown part!");
 
-        // printing the results
-        cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name: \t\t"<<"Count: "<<endl;
-        for(int i = 0; i < images.size(); i++)
-        {
-            cout<<images[i].getName()<<"\t\t  "<<images[i].getCount()<<endl;
-        }
-    }
-    else if(part == "part2")
-      {
-	// do something here!
-      }
-    else
-      throw std::string("unknown part!");
-
-    // feel free to add more conditions for other parts (e.g. more specific)
-    //  parts, for debugging, etc.
-  }
-  catch(const string &err) {
-    cerr << "Error: " << err << endl;
-  }
+		// feel free to add more conditions for other parts (e.g. more specific)
+		//  parts, for debugging, etc.
+	}
+	catch(const string &err) {
+		cerr << "Error: " << err << endl;
+	}
 }
-
-
-
-
-
-
 
 
