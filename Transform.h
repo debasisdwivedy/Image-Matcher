@@ -44,7 +44,6 @@ void interpolate(const cimg_library::CImg<T>& img, double x, double y, T* result
 			else if (x >= img.width())
 				pixelX = 2 * img.width() - pixelX;
 		}
-		pixel_locs[i] = std::make_pair(pixelX, img.height() - pixelY);
 		pixel_locs[i] = std::make_pair(pixelX, pixelY);
 	}
 	
@@ -70,13 +69,6 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 		t.transformCoord(corners[2].first, corners[2].second, true),
 		t.transformCoord(corners[3].first, corners[3].second, true),
 	};
-#if 0
-	for (int i=0; i<4; i++) {
-		std::cout<<"Corner #"<<i<<": "
-			"("<<corners[i].first<<","<<corners[i].second<<") =>"
-			"("<<updated[i].first<<","<<updated[i].second<<")"<<std::endl;
-	}
-#endif
 	double rightMost = std::max(std::max(updated[0].first, updated[1].first),
 								std::max(updated[2].first, updated[3].first));
 	double leftMost = std::min(std::min(updated[0].first, updated[1].first),
@@ -87,27 +79,10 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 								std::min(updated[2].second, updated[3].second));
 
 	double widthMapped = rightMost - leftMost, heightMapped = topMost - bottomMost;
-	//t.translate(-leftMost, -bottomMost);
 	Transformation inverse = t.inverse();
 	//cimg_library::CImg<T> result(widthMapped, heightMapped, 1, img.spectrum(),0);
 	cimg_library::CImg<T> result(img.width(), img.height(), 1, img.spectrum(),0);
 	
-#if 0
-	int pixels_mapped = 0;
-	for (int x=0; x<img.width(); x++) {
-		for (int y=0; y<img.height(); y++) {
-			std::pair<double, double> coord = t.transformCoord(x, y);
-			int row = (int)(coord.first + 0.5), col = (int)(coord.second + 0.5);
-			if (row < result.width() && row >= 0 && col >= 0 && col < result.height()) {
-				for (int c=0; c<img.spectrum(); c++) {
-					result(row, result.height() - col, c) = img(x, img.height() - y, c);
-				}
-				pixels_mapped ++;
-			}
-		}
-	}
-	std::cout<<"Pixels mapped: "<<pixels_mapped<<" out of "<<img.width() * img.height()<<std::endl;
-#else
 	for (int x=0; x<result.width(); x++) {
 		for (int y=0; y<result.height(); y++) {
 			std::pair<double, double> coord = inverse.transformCoord(x,y);
@@ -116,14 +91,11 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 				T res[5];
 				interpolate(img, coord.first, coord.second, &res[0]);
 				for (int c=0; c<img.spectrum(); c++) {
-					//result(x, result.height() - y, c) = res[c];
 					result(x, y, c) = res[c];
 				}
 			}
-			//std::cout<<"Retrieving from: "<<coord.first<<", "<<coord.second<<std::endl;
 		}
 	}
-#endif
 	return result;
 }
 
