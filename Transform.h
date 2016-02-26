@@ -45,6 +45,7 @@ void interpolate(const cimg_library::CImg<T>& img, double x, double y, T* result
 				pixelX = 2 * img.width() - pixelX;
 		}
 		pixel_locs[i] = std::make_pair(pixelX, img.height() - pixelY);
+		pixel_locs[i] = std::make_pair(pixelX, pixelY);
 	}
 	
 	for (int i=0; i<img.spectrum(); i++) {
@@ -115,7 +116,8 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 				T res[5];
 				interpolate(img, coord.first, coord.second, &res[0]);
 				for (int c=0; c<img.spectrum(); c++) {
-					result(x, result.height() - y, c) = res[c];
+					//result(x, result.height() - y, c) = res[c];
+					result(x, y, c) = res[c];
 				}
 			}
 			//std::cout<<"Retrieving from: "<<coord.first<<", "<<coord.second<<std::endl;
