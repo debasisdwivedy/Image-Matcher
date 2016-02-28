@@ -103,7 +103,7 @@ cimg_library::CImg<double> annotate_sift_points(const CImg<double>& image, const
 MappedCoordinates getMappedCoordinate(const std::pair<SiftDescriptor, SiftDescriptor>& p) {
 	MappedCoordinates mc = {
 		p.first.col, p.first.row, 
-		p.second.row, p.second.col
+		p.second.col, p.second.row
 	};
 	return mc;
 }
