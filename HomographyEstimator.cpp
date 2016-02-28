@@ -91,3 +91,12 @@ SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const 
 	return best.second;
 }
 
+int main() {
+	MappedCoordinates mp[4] = {
+		{0, 0, -182, 58},
+		{0, 1023, 46.878, 876.02},
+		{680, 0, 548.995, -58.1372},
+		{680, 1023, 453.776, 926.836}
+	};
+	solve_maps(mp).print();
+}
