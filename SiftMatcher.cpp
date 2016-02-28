@@ -58,12 +58,11 @@ std::vector<MappedCoordinates> SiftMatcher::match(
 	}
 
 	return result;
-
 }
 
 
 double SiftMatcher::descriptor_distance(
-				const SiftDescriptor& s1, const SiftDescriptor& s2) const{
+				const SiftDescriptor& s1, const SiftDescriptor& s2) {
 	double sum = 0;
 	for(int k = 0; k < 128; k++) {
 		double delta = s1.descriptor[k] - s2.descriptor[k];
@@ -73,7 +72,7 @@ double SiftMatcher::descriptor_distance(
 }
 
 
-cimg_library::CImg<double> SiftMatcher::annotate_sift_points(const CImg<double>& image, const std::vector<SiftDescriptor>& descriptors) const {
+cimg_library::CImg<double> SiftMatcher::annotate_sift_points(const CImg<double>& image, const std::vector<SiftDescriptor>& descriptors) {
 	CImg<double> result(image);
 	for(size_t i=0; i<descriptors.size(); i++) {
 		for(size_t j=0; j<5; j++) {

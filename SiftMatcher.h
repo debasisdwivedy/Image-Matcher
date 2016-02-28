@@ -12,10 +12,10 @@ class SiftMatcher {
 	const Config& config;
 
 protected:
-	cimg_library::CImg<double> annotate_sift_points(
-			const cimg_library::CImg<double>&, const std::vector<SiftDescriptor>&) const;
+	static cimg_library::CImg<double> annotate_sift_points(
+			const cimg_library::CImg<double>&, const std::vector<SiftDescriptor>&);
 
-	double descriptor_distance(const SiftDescriptor&, const SiftDescriptor&) const;
+	static double descriptor_distance(const SiftDescriptor&, const SiftDescriptor&);
 public:
 	SiftMatcher(const Config&);
 	virtual ~SiftMatcher();
