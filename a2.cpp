@@ -340,6 +340,7 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 
 int main(int argc, char **argv)
 {
+	std::srand(time(0));
 	//return temp();
 	Config config("config.txt");
 	try {
