@@ -4,7 +4,8 @@
 #include <vector>
 #include "Matrix.h"
 #include "MappedCoordinates.h"
+#include "Config.h"
 
-SqMatrix estimate_homography(const std::vector<MappedCoordinates>&);
+SqMatrix estimate_homography(const std::vector<MappedCoordinates>&, const Config&);
 
 #endif
