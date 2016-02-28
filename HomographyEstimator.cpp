@@ -77,11 +77,14 @@ namespace {
 
 SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const Config& config) {
 	int trial_count = 50;
-	std::pair<int, SqMatrix> best(0, SqMatrix(3));
+	std::pair<int, SqMatrix> best(-1, SqMatrix(3));
 	for (int i=0; i<trial_count; i++) {
 		std::pair<int, SqMatrix> res = test_hypothesis(input, config);
 		if (res.first > best.first) {
+			std::cout<<"Selecting Matrix:"<<std::endl;
 			best = res;
+			best.second.print();
+			std::cout<<std::endl;
 		}
 	}
 
