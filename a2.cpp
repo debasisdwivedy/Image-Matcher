@@ -338,9 +338,9 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 //----------------------------------------------------------------------------------------
 
 
-int m1ain(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	return temp();
+	//return temp();
 	Config config("config.txt");
 	try {
 		if(argc < 2) {

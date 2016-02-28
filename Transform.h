@@ -64,10 +64,10 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 		std::make_pair(img.height() - 1, img.width() - 1)
 	};
 	std::pair<double, double> updated[] = {
-		t.transformCoord(corners[0].first, corners[0].second, true),
-		t.transformCoord(corners[1].first, corners[1].second, true),
-		t.transformCoord(corners[2].first, corners[2].second, true),
-		t.transformCoord(corners[3].first, corners[3].second, true),
+		t.transformCoord(corners[0].first, corners[0].second),
+		t.transformCoord(corners[1].first, corners[1].second),
+		t.transformCoord(corners[2].first, corners[2].second),
+		t.transformCoord(corners[3].first, corners[3].second),
 	};
 	/*double rightMost = std::max(std::max(updated[0].first, updated[1].first),
 								std::max(updated[2].first, updated[3].first));

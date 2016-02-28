@@ -3,6 +3,14 @@
 #include "Transform.h"
 
 namespace {
+	void print(CImg<double> mat) {
+		for (int i=0; i<mat.height(); i++) {
+			for (int j=0; j<mat.width(); j++) {
+				std::cout<<mat(j,i)<<" ";
+			}
+			std::cout<<std::endl;
+		}
+	}
 	std::pair<CImg<double>, CImg<double> > get_matrix(MappedCoordinates input[4]) {
 		//Return matrices A and B from the equation: AX = B;
 		CImg<double> matA(8, 8), matB(1,8);
@@ -19,15 +27,21 @@ namespace {
 			matA(0, i*2+1) = 0;
 			matA(1, i*2+1) = 0;
 			matA(2, i*2+1) = 0;
-			matA(3, i*2) = input[i].x1;
-			matA(4, i*2) = input[i].y1;
-			matA(5, i*2) = 1;
-			matA(6, i*2) = -(input[i].x1 * input[i].y2);
-			matA(7, i*2) = -(input[i].y1 * input[i].y2);
+			matA(3, i*2+1) = input[i].x1;
+			matA(4, i*2+1) = input[i].y1;
+			matA(5, i*2+1) = 1;
+			matA(6, i*2+1) = -(input[i].x1 * input[i].y2);
+			matA(7, i*2+1) = -(input[i].y1 * input[i].y2);
 
 			matB(0, i*2) = input[i].x2;
 			matB(0, i*2+1) = input[i].y2;
 		}
+#if 0
+		std::cout<<"A Matrix: "<<std::endl;
+		print(matA);
+		std::cout<<"B Matrix: "<<std::endl;
+		print(matB);
+#endif
 		return std::make_pair(matA, matB);
 	}
 
@@ -89,14 +103,4 @@ SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const 
 	}
 
 	return best.second;
-}
-
-int main() {
-	MappedCoordinates mp[4] = {
-		{0, 0, -182, 58},
-		{0, 1023, 46.878, 876.02},
-		{680, 0, 548.995, -58.1372},
-		{680, 1023, 453.776, 926.836}
-	};
-	solve_maps(mp).print();
 }
