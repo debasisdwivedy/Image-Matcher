@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 #include <functional>
+#include <iomanip>
 
 #include "CImg.h"
 #include "Sift.h"
@@ -363,6 +364,7 @@ int main(int argc, char **argv)
 			SiftMatcher matcher(config);
 			for(int i=3; i<argc; i++)
 			{
+				std::cout<<"Processing: "<<argv[i]<<std::endl;
 				CImg<double> img(argv[i]);
 				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
 				matchResult.push_back(ImageMatchResult(argv[i], result.size()));
@@ -372,9 +374,9 @@ int main(int argc, char **argv)
 			std::sort(matchResult.begin(), matchResult.end(), std::greater<ImageMatchResult>());
 
 			// printing the results
-			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name:\t\t\t\t\t"<<"Count: "<<endl;
+			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<std::setw(50)<<"Image Name:"<<setw(10)<<"Count: "<<endl;
 			for(int i = 0; i < matchResult.size(); i++) {
-				std::cout<<matchResult[i].getName()<<"\t\t\t\t\t"<<matchResult[i].getCount()<<std::endl;
+				std::cout<<std::setw(50)<<matchResult[i].getName()<<std::setw(10)<<matchResult[i].getCount()<<std::endl;
 			}
 
 		}
