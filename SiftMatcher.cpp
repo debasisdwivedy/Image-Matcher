@@ -87,7 +87,7 @@ cimg_library::CImg<double> annotate_sift_points(const CImg<double>& image, const
 		for(size_t j=0; j<5; j++) {
 			for(size_t k=0; k<5; k++) {
 				if(j==2 || k==2) {
-					for(size_t p=0; p<3; p++) {
+					for(size_t p=0; p<result.spectrum(); p++) {
 						if(descriptors[i].col+k < result.width() && 
 									descriptors[i].row+j < result.height()) {
 							result(descriptors[i].col+k, descriptors[i].row+j, 0, p)=0;
