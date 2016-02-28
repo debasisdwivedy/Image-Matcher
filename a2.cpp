@@ -11,11 +11,12 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <map>
 #include <list>
 #include <functional>
 #include <iomanip>
+#include <algorithm>
 
 #include "CImg.h"
 #include "Sift.h"
@@ -25,6 +26,7 @@
 #include "SiftMatcher.h"
 #include "MappedCoordinates.h"
 #include "ImageMatchResult.h"
+#include "HomographyEstimator.h"
 
 
 //Use the cimg namespace to access the functions easily
@@ -378,7 +380,7 @@ int main(int argc, char **argv)
 
 			// printing the results
 			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<std::setw(50)<<"Image Name:"<<setw(10)<<"Count: "<<endl;
-			for(int i = 0; i < matchResult.size(); i++) {
+			for(size_t i = 0; i < matchResult.size(); i++) {
 				std::cout<<std::setw(50)<<matchResult[i].getName()<<std::setw(10)<<matchResult[i].getCount()<<std::endl;
 			}
 
@@ -449,7 +451,7 @@ int main(int argc, char **argv)
 				CImg<double> paired = paste_image(input_image, target_image);
 
 				const unsigned char color[] = { 255,128,64 };
-				for (int i = 0; i < pairs.size(); i++)
+				for (size_t i = 0; i < pairs.size(); i++)
 				{
 					int x1 = descriptors[pairs[i].first].col;
 					int y1 = descriptors[pairs[i].first].row;
@@ -470,10 +472,30 @@ int main(int argc, char **argv)
 			}
 
 		}
-		else if(part == "part2")
-		{
-			// do something here!
+		else if(part == "part2") {
+			if(argc < 4) {
+				cout << "Insufficent number of arguments." << endl;
+				return -1;
+			}
 
+			CImg<double> query(argv[2]);
+			SiftMatcher matcher(config);
+			for(int i=3; i<argc; i++) {
+				std::cout<<"Processing: "<<argv[i]<<std::endl;
+				CImg<double> img(argv[i]);
+				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
+				std::vector<MappedCoordinates> mapped;
+				for (int j=0; j<result.size(); j++) {
+					mapped.push_back(getMappedCoordinate(result[j]));
+				}
+				//std::transform(result.begin(), result.end(), mapped.begin(), getMappedCoordinate);
+				SqMatrix mat(estimate_homography(mapped, config));
+				std::cout<<"Transformation Matrix:\n"<<std::endl;
+				mat.print();
+				Transformation t(mat);
+				CImg<double> transformed_image(transform_image(img, t));
+				transformed_image.save(("warped-" + std::string(argv[i])).c_str());
+			}
 		}
 		else
 			throw std::string("unknown part!");

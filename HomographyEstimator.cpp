@@ -5,7 +5,7 @@
 namespace {
 	std::pair<CImg<double>, CImg<double> > get_matrix(MappedCoordinates input[4]) {
 		//Return matrices A and B from the equation: AX = B;
-		CImg<double> matA(8, 8), matB(8,8);
+		CImg<double> matA(8, 8), matB(1,8);
 		for (int i=0; i<4; i++) {
 			matA(0, i*2) = input[i].x1;
 			matA(1, i*2) = input[i].y1;
@@ -75,7 +75,7 @@ namespace {
 	}
 }
 
-SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, Config& config) {
+SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const Config& config) {
 	int trial_count = 50;
 	std::pair<int, SqMatrix> best(0, SqMatrix(3));
 	for (int i=0; i<trial_count; i++) {
