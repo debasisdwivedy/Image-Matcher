@@ -3,7 +3,7 @@
 BIN = a2
 
 # Define source files
-SRCS = ./Matrix.cpp ./utils.cpp ./Transform.cpp ./siftpp/sift.cpp ./a2.cpp
+SRCS = ./SiftMatcher.cpp ./Matrix.cpp ./utils.cpp ./Transform.cpp ./siftpp/sift.cpp ./HomographyEstimator.cpp ./Config.cpp ./a2.cpp
 
 # Define header file paths
 INCPATH = -I. -Isiftpp
