@@ -11,21 +11,20 @@
 class SiftMatcher {
 	const Config& config;
 
-protected:
-	static cimg_library::CImg<double> annotate_sift_points(
-			const cimg_library::CImg<double>&, const std::vector<SiftDescriptor>&);
-
-	static double descriptor_distance(const SiftDescriptor&, const SiftDescriptor&);
 public:
 	SiftMatcher(const Config&);
 	virtual ~SiftMatcher();
 	
-	std::vector<MappedCoordinates> match(
+	std::vector<std::pair<SiftDescriptor, SiftDescriptor> > match(
 			const cimg_library::CImg<double>&, const CImg<double>&) const;
-
 };
 
+double descriptor_distance(const SiftDescriptor&, const SiftDescriptor&);
 
+MappedCoordinates getMappedCoordinate(const std::pair<SiftDescriptor, SiftDescriptor>&);
+
+cimg_library::CImg<double> annotate_sift_points(
+		const cimg_library::CImg<double>&, const std::vector<SiftDescriptor>&);
 std::ostream& operator<<(std::ostream& out, const SiftDescriptor& desc);
 
 #endif
