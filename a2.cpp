@@ -366,10 +366,11 @@ int main(int argc, char **argv)
 			{
 				if (std::string(argv[i]) == std::string(argv[2]))
 					continue;
-				std::cout<<"Processing: "<<argv[i]<<std::endl;
+				std::cout<<"Processing: "<<argv[i];
 				CImg<double> img(argv[i]);
 				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
 				matchResult.push_back(ImageMatchResult(argv[i], result.size()));
+				std::cout<<" ["<<result.size()<<" matches]"<<std::endl;
 			} 
 
 			// sort according to the sift match count
