@@ -12,103 +12,23 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <map>
+#include <list>
+#include <functional>
+
 #include "CImg.h"
 #include "Sift.h"
 #include "Matrix.h"
 #include "Transform.h"
-#include <map>
-#include <list>
 #include "utils.h"
+#include "SiftMatcher.h"
 #include "MappedCoordinates.h"
+#include "ImageMatchResult.h"
 
 
 //Use the cimg namespace to access the functions easily
 using namespace cimg_library;
 using namespace std;
-
-// holds the name of the image file and the matching score of sift descriptors
-class Image
-{
-
-	string name;
-	int count;
-
-	public:
-	Image(string name, int count)
-	{
-		this->name = name;
-		this->count = count;
-	}
-
-	int getCount()
-	{
-		return count;
-	}
-
-	string getName()
-	{
-		return name;
-	}
-
-	bool operator < (const Image& i1) const
-	{
-		return count > i1.count;
-	}
-};
-
-int sift_matching(const CImg<double>& input1, const CImg<double>& input2, string part, int MINIMUM_SIFT_DISTANCE  = 150)
-{
-	int matches=0, maxHeight = 0;
-	const unsigned char color[] = {0, 255, 0};
-
-	CImg<double> greyScale1, greyScale2;
-
-	// converting the images to grayscale
-	if(input1.spectrum() == 1)
-		greyScale1 = input1;
-	else
-		greyScale1 = input1.get_RGBtoHSI().get_channel(2);
-
-	if(input2.spectrum() == 1)
-		greyScale2 = input2;
-	else
-		greyScale2 = input2.get_RGBtoHSI().get_channel(2);
-
-	vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
-	vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
-
-	CImg<double> temp1 = annotate_sift_points(input1, desc1);
-	CImg<double> temp2 = annotate_sift_points(input2, desc2);
-
-	CImg<double> output(paste_image(temp1, temp2));
-	output.save("joined.png");
-
-	// matching both the descriptors and obtaining the number of matches
-	for(int i = 0; i < desc1.size(); i++)
-	{
-		for(int j = 0; j < desc2.size(); j++)
-		{
-			double distance = descriptor_distance(desc1[i], desc2[j]);
-
-			if(distance < MINIMUM_SIFT_DISTANCE)
-			{
-				if(part == "part1.1")
-				{
-					output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
-				}
-				matches++;
-			}
-		}
-	}
-
-	// saving the sift output to a image file
-	if(part == "part1.1")
-	{
-		output.save("sift.png");
-	}
-
-	return matches;
-}
 
 void img_display(const CImg<double>& img) {
 	cimg_library::CImgDisplay main_disp(img, "temp");
@@ -146,18 +66,6 @@ CImg<double> compute_X()
 	CImg<double> rand_mat(5, 128);
 	rand_mat.rand(0,1.0);
 	return rand_mat;
-}
-
-bool nearest_neighbour(const vector< double> &input1, const vector< double> &input2)
-{
-	for (int i = 0; i < 10; i++)
-	{
-		if (input1[i] != input2[i])
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 bool compare_summary(const CImg<double> &src, const CImg<double> &target,int a, int b)
@@ -289,34 +197,6 @@ void mark_descriptors(CImg<double> &input_image, const vector<SiftDescriptor> & 
 	}
 }
 
-void copying(CImg<double> &target, const CImg<double> &src)
-{
-	for (int i = 0; i < src.height(); i++)
-	{
-		for (int j = 0; j < src.width(); j++)
-		{
-			target(j, i, 0, 0) = src(j, i, 0, 0);
-			target(j, i, 0, 1) = src(j, i, 0, 1);
-			target(j, i, 0, 2) = src(j, i, 0, 2);
-		}
-	}
-}
-
-CImg<double> stack_image(const CImg<double> &img1, const CImg<double> &img2)
-{
-	int cols = img1.width() + img2.width();
-	int rows = max(img1.height(), img2.height());
-
-	CImg<double> newimg(cols, rows, 1, 3);
-	newimg = 0.0;
-
-	copying(newimg, img2);
-	newimg.shift(img1.width());
-	copying(newimg, img1);
-
-	return newimg;
-}
-
 CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 	int i, j, k, select_index;
 	int inliners = 0;
@@ -443,7 +323,6 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
 			cout << best_transformation_matrix(j, i) << " ";
-
 		}
 		cout << "\n";
 	}
@@ -459,9 +338,9 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 int main(int argc, char **argv)
 {
 	//return temp();
+	Config config("config.txt");
 	try {
-		if(argc < 2)
-		{
+		if(argc < 2) {
 			cout << "Insufficent number of arguments; correct usage:" << endl;
 			cout << "    a2-p1 part_id ..." << endl;
 			return -1;
@@ -470,48 +349,32 @@ int main(int argc, char **argv)
 		string part = argv[1];
 
 		// Sift detector
-		if(part == "part1.1")
-		{
-			if(argc < 4)
-			{
+		if(!part.compare(0, 5,"part1")) {
+			if(argc < 4) {
 				cout << "Insufficent number of arguments." << endl;
 				return -1;
 			}
 
-			CImg<double> input1(argv[2]);
-			CImg<double> input2(argv[3]);
-
-			double matches = sift_matching(input1, input2, part);
-			cout<<"The Number of Sift Matches: "<<matches<<endl;
-		}
-		else if(part == "part1.2")
-		{
-			if(argc < 4)
-			{
-				cout << "Insufficent number of arguments." << endl;
-				return -1;
-			}
-
-			CImg<double> input(argv[2]);
-
+			CImg<double> query(argv[2]);
 			// creating a vector to store the sift matches for each of the image
-			vector<Image> images;
+			std::vector<ImageMatchResult> matchResult;
 
 			// take in all the images from the cammand line and calculate sift matches of the descriptors
+			SiftMatcher matcher(config);
 			for(int i=3; i<argc; i++)
 			{
 				CImg<double> img(argv[i]);
-				images.push_back(Image(argv[i], sift_matching(input, img, part)));
+				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
+				matchResult.push_back(ImageMatchResult(argv[i], result.size()));
 			} 
 
 			// sort according to the sift match count
-			std::sort(images.begin(), images.end());
+			std::sort(matchResult.begin(), matchResult.end(), std::greater<ImageMatchResult>());
 
 			// printing the results
-			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name: \t\t"<<"Count: "<<endl;
-			for(int i = 0; i < images.size(); i++)
-			{
-				cout<<images[i].getName()<<"\t\t  "<<images[i].getCount()<<endl;
+			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<"Image Name:\t\t\t\t\t"<<"Count: "<<endl;
+			for(int i = 0; i < matchResult.size(); i++) {
+				std::cout<<matchResult[i].getName()<<"\t\t\t\t\t"<<matchResult[i].getCount()<<std::endl;
 			}
 
 		}
@@ -578,7 +441,7 @@ int main(int argc, char **argv)
 
 				//double distance = sift_matching_with_random_vecotr(descriptors, target_descriptors, rand_mat, pairs);
 
-				CImg<double> paired = stack_image(input_image, target_image);
+				CImg<double> paired = paste_image(input_image, target_image);
 
 				const unsigned char color[] = { 255,128,64 };
 				for (int i = 0; i < pairs.size(); i++)

@@ -1,0 +1,4 @@
+SiftMatcher.max_dist 50
+SiftMatcher.savejoined 1
+SiftMatcher.savelines 1
+SiftMatcher.dist_ratio 0.2
