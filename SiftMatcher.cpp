@@ -1,4 +1,5 @@
 #include <cmath>
+#include <limits>
 #include "SiftMatcher.h"
 #include "utils.h"
 
@@ -31,20 +32,27 @@ std::vector<std::pair<SiftDescriptor, SiftDescriptor> > SiftMatcher::match(
 	}
 
 	// matching both the descriptors and obtaining the number of matches
+	double dist_ratio = config.get<double>("SiftMatcher.dist_ratio");
 	std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result;
-	for(size_t i = 0; i < desc1.size(); i++)
-	{
-		for(size_t j = 0; j < desc2.size(); j++)
-		{
+	for(size_t i = 0; i < desc1.size(); i++) {
+		double closestIndex=0, secondClosestIndex=0;
+		double closestDist = std::numeric_limits<double>::infinity(),
+			   secondClosestDist = std::numeric_limits<double>::infinity();
+		for(size_t j = 0; j < desc2.size(); j++) {
 			double distance = descriptor_distance(desc1[i], desc2[j]);
 
-			if(distance < sift_distance_threshold)
-			{
-				output.draw_line(desc1[i].col, desc1[i].row, 
-						desc2[j].col + input1.width(), desc2[j].row, color);
-
-				result.push_back(std::make_pair(desc1[i], desc2[j]));
+			if(distance < closestDist) {
+				secondClosestDist = closestDist;
+				secondClosestIndex = closestIndex;
+				closestDist = distance;
+				closestIndex = j;
 			}
+		}
+		if (closestDist/secondClosestDist < dist_ratio) {
+			output.draw_line(desc1[i].col, desc1[i].row, 
+				desc2[closestIndex].col + input1.width(), desc2[closestIndex].row, color);
+
+			result.push_back(std::make_pair(desc1[i], desc2[closestIndex]));
 		}
 	}
 
@@ -70,12 +78,12 @@ double descriptor_distance(const SiftDescriptor& s1, const SiftDescriptor& s2) {
 cimg_library::CImg<double> annotate_sift_points(const CImg<double>& image, const std::vector<SiftDescriptor>& descriptors) {
 	CImg<double> result(image);
 	for(size_t i=0; i<descriptors.size(); i++) {
-		std::cout<<"descriptor #"<<i<<": x="<<descriptors[i].col 
+		/*std::cout<<"descriptor #"<<i<<": x="<<descriptors[i].col 
 			<<" y="<<descriptors[i].row<<" descriptor=(";
 		for(int l=0; l<128; l++)
 			std::cout << descriptors[i].descriptor[l] << "," ;
 		std::cout<<")"<<std::endl;
-
+		*/
 		for(size_t j=0; j<5; j++) {
 			for(size_t k=0; k<5; k++) {
 				if(j==2 || k==2) {
