@@ -18,6 +18,9 @@
 #include "Transform.h"
 #include <map>
 #include <list>
+#include "utils.h"
+#include "MappedCoordinates.h"
+
 
 //Use the cimg namespace to access the functions easily
 using namespace cimg_library;
@@ -26,119 +29,85 @@ using namespace std;
 // holds the name of the image file and the matching score of sift descriptors
 class Image
 {
-    public:
 
-    string name;
-    int count;
+	string name;
+	int count;
 
-    void setParameters(string name, int count)
-    {
-        this->name = name;
-        this->count = count;
-    }
+	public:
+	Image(string name, int count)
+	{
+		this->name = name;
+		this->count = count;
+	}
 
-    int getCount()
-    {
-        return count;
-    }
+	int getCount()
+	{
+		return count;
+	}
 
-    string getName()
-    {
-        return name;
-    }
+	string getName()
+	{
+		return name;
+	}
 
-    bool operator < (const Image& i1) const
-    {
-        return count > i1.count;
-    }
+	bool operator < (const Image& i1) const
+	{
+		return count > i1.count;
+	}
 };
 
-int sift_matching(CImg<double> input1, CImg<double> input2, string part, int MINIMUM_SIFT_DISTANCE  = 100)
+int sift_matching(const CImg<double>& input1, const CImg<double>& input2, string part, int MINIMUM_SIFT_DISTANCE  = 150)
 {
-    int matches=0, maxHeight = 0;
-    const unsigned char color[] = {0, 255, 0};
+	int matches=0, maxHeight = 0;
+	const unsigned char color[] = {0, 255, 0};
 
-    CImg<double> greyScale1, greyScale2;
+	CImg<double> greyScale1, greyScale2;
 
-    // converting the images to grayscale
-    if(input1.spectrum() == 1)
-        greyScale1 = input1;
-    else
-        greyScale1 = input1.get_RGBtoHSI().get_channel(2);
+	// converting the images to grayscale
+	if(input1.spectrum() == 1)
+		greyScale1 = input1;
+	else
+		greyScale1 = input1.get_RGBtoHSI().get_channel(2);
 
-    if(input2.spectrum() == 1)
-    	greyScale2 = input2;
-    else
-	    greyScale2 = input2.get_RGBtoHSI().get_channel(2);
+	if(input2.spectrum() == 1)
+		greyScale2 = input2;
+	else
+		greyScale2 = input2.get_RGBtoHSI().get_channel(2);
 
-    vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
-    vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
+	vector<SiftDescriptor> desc1 = Sift::compute_sift(greyScale1);
+	vector<SiftDescriptor> desc2 = Sift::compute_sift(greyScale2);
 
+	CImg<double> temp1 = annotate_sift_points(input1, desc1);
+	CImg<double> temp2 = annotate_sift_points(input2, desc2);
 
-    // creating a merged image using the two images
-    maxHeight = max(input1.height(),input2.height());
+	CImg<double> output(paste_image(temp1, temp2));
+	output.save("joined.png");
 
-    CImg<double> output(input1.width() + input2.width(), maxHeight, 1, input1.spectrum(), 0);
+	// matching both the descriptors and obtaining the number of matches
+	for(int i = 0; i < desc1.size(); i++)
+	{
+		for(int j = 0; j < desc2.size(); j++)
+		{
+			double distance = descriptor_distance(desc1[i], desc2[j]);
 
-	// first image on the left of the merged image
+			if(distance < MINIMUM_SIFT_DISTANCE)
+			{
+				if(part == "part1.1")
+				{
+					output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
+				}
+				matches++;
+			}
+		}
+	}
+
+	// saving the sift output to a image file
 	if(part == "part1.1")
-    {
-        for(int i = 0; i < input1.width(); i++)
-    	{
-    		for(int j = 0; j < input1.height(); j++)
-    		{
-    	        for(int k = 0; k < input1.spectrum(); k++)
-    			{
-    			    output(i, j, 0, k) = input1(i, j, 0, k);
-    			}
-    		}
-    	}
+	{
+		output.save("sift.png");
+	}
 
-    	// second image on the right of the merged image
-    	for(int i = input1.width(); i < output.width(); i++)
-    	{
-    		for(int j = 0; j < input2.height(); j++)
-    		{
-    	        for(int k = 0; k < input2.spectrum(); k++)
-    			{
-    			    output(i, j, 0, k) = input2(i - input1.width(), j, 0, k);
-    			}
-    		}
-    	}
-    }
-
-    // matching both the descriptors and obtaining the number of matches
-    for(int i = 0; i < desc1.size(); i++)
-    {
-        for(int j = 0; j < desc2.size(); j++)
-        {
-            double sum = 0;
-
-            for(int k = 0; k < 128; k++)
-            {
-                sum += pow((desc1[i].descriptor[k]-desc2[j].descriptor[k]),2);
-            }
-
-            sum = sqrt(sum);
-
-            if(sum < MINIMUM_SIFT_DISTANCE)
-            {
-                if(part == "part1.1")
-                {
-                    output.draw_line(desc1[i].col, desc1[i].row, desc2[j].col + input1.width(), desc2[j].row, color);
-                }
-                matches++;
-            }
-        }
-    }
-
-    // saving the sift output to a image file
-    if(part == "part1.1")
-    {
-        output.save("sift.png");
-    }
-
-    return matches;
+	return matches;
 }
 
 void img_display(const CImg<double>& img) {
@@ -149,25 +118,8 @@ void img_display(const CImg<double>& img) {
 }
 
 int temp() {
-#if 0
-	CImg<double> img("lincoln.png");
-	SqMatrix mat = SqMatrix::identity(3);
-
-	Transformation t(mat);
-	t.translate(30,30);
-	t.rotate(-M_PI/6.0);
-	CImg<double> result(transform_image<double>(img, t));
-	cimg_library::CImgDisplay d1(img, "temp1");
-	cimg_library::CImgDisplay d2(result, "temp2");
-	result.save("result.png");
-
-	while (!d1.is_closed() || !d2.is_closed()) {
-		d1.wait();
-		d2.wait();
-	}
-#else
 	SqMatrix mat(3);
-	mat(0,0) = 0.9;
+	mat(0,0) = 0.907;
 	mat(0,1) = 0.258;
 	mat(0,2) = -182;
 	mat(1,0) = -0.153;
@@ -177,28 +129,13 @@ int temp() {
 	mat(2,1) = 0.000731;
 	mat(2,2) = 1;
 
-	//mat = mat.transpose();
-
 	Transformation t(mat);
 	CImg<double> img("lincoln.png");
 	CImg<double> result = transform_image<double>(img, t);
+	result.save("lincoln-result.png");
 	img_display(result);
 
 	return 0;
-#endif
-}
-
-//-----------------------------------------------------------------------------------------
-
-double euclidean_distance(const SiftDescriptor &input1, const SiftDescriptor &input2)
-{
-	double distance = 0;
-		for (int i = 0; i < 128; i++)
-		{
-			distance=distance+(input1.descriptor[i] - input2.descriptor[i]) * (input1.descriptor[i] - input2.descriptor[i]);
-		}
-		distance=sqrt(distance);
-		return distance;
 }
 
 //
@@ -215,10 +152,10 @@ bool nearest_neighbour(const vector< double> &input1, const vector< double> &inp
 {
 	for (int i = 0; i < 10; i++)
 	{
-	if (input1[i] != input2[i])
-	{
-	return false;
-	}
+		if (input1[i] != input2[i])
+		{
+			return false;
+		}
 	}
 	return true;
 }
@@ -227,11 +164,11 @@ bool compare_summary(const CImg<double> &src, const CImg<double> &target,int a, 
 {
 	for (int i = 0; i < 5; i++)
 	{
-	//if (abs(src(i, a) - target(i, b)) >= tolerance)
-	if (src(i, a) != target(i, b))
-	{
-	return false;
-	}
+		//if (abs(src(i, a) - target(i, b)) >= tolerance)
+		if (src(i, a) != target(i, b))
+		{
+			return false;
+		}
 	}
 	return true;
 }
@@ -272,7 +209,7 @@ double projection_function(const vector<SiftDescriptor> &input1, const vector<Si
 		int j;
 		for (j = 0; j < N; j++) {
 			if (compare_summary(src_summary_vecs, target_summary_vecs, i, j)) {
-				double diff = euclidean_distance(input1[i], input2[j]);
+				double diff = descriptor_distance(input1[i], input2[j]);
 				printf("%d<>%d:%f\n", i, j, diff);
 				if (min_dist > diff) {
 					second_dist = min_dist;
@@ -287,7 +224,7 @@ double projection_function(const vector<SiftDescriptor> &input1, const vector<Si
 		}
 		if (min_dist == std::numeric_limits<double>::infinity()) {
 			for (j = 0; j < N; j++) {
-				double diff = euclidean_distance(input1[i], input2[j]);
+				double diff = descriptor_distance(input1[i], input2[j]);
 				if (min_dist > diff) {
 					second_dist = min_dist;
 					second_index = min_index;
@@ -331,23 +268,23 @@ void mark_descriptors(CImg<double> &input_image, const vector<SiftDescriptor> & 
 {
 	for(int i=0; i<descriptors.size(); i++)
 	{
-	cout << "descriptor #" << i << ": x=" << descriptors[i].col << " y=" << descriptors[i].row << " descriptor=(";
-	for(int l=0; l<128; l++)
-	cout << descriptors[i].descriptor[l] << "," ;
-	cout << ")" << endl;
+		cout << "descriptor #" << i << ": x=" << descriptors[i].col << " y=" << descriptors[i].row << " descriptor=(";
+		for(int l=0; l<128; l++)
+			cout << descriptors[i].descriptor[l] << "," ;
+		cout << ")" << endl;
 
-	for(int j=0; j<5; j++)
-	for(int k=0; k<5; k++)
-	if(j==2 || k==2)
-	{
-	int x_d = descriptors[i].col+k;
-	int y_d = descriptors[i].row+j;
-	x_d = min(x_d, input_image.width() - 1);
-	y_d = min(y_d, input_image.height() - 1);
-	input_image(x_d, y_d, 0, 0)=0;
-	input_image(x_d, y_d, 0, 1)=0;
-	input_image(x_d, y_d, 0, 2)=0;
-	}
+		for(int j=0; j<5; j++)
+			for(int k=0; k<5; k++)
+				if(j==2 || k==2)
+				{
+					int x_d = descriptors[i].col+k;
+					int y_d = descriptors[i].row+j;
+					x_d = min(x_d, input_image.width() - 1);
+					y_d = min(y_d, input_image.height() - 1);
+					input_image(x_d, y_d, 0, 0)=0;
+					input_image(x_d, y_d, 0, 1)=0;
+					input_image(x_d, y_d, 0, 2)=0;
+				}
 
 	}
 }
@@ -356,12 +293,12 @@ void copying(CImg<double> &target, const CImg<double> &src)
 {
 	for (int i = 0; i < src.height(); i++)
 	{
-	for (int j = 0; j < src.width(); j++)
-	{
-	target(j, i, 0, 0) = src(j, i, 0, 0);
-	target(j, i, 0, 1) = src(j, i, 0, 1);
-	target(j, i, 0, 2) = src(j, i, 0, 2);
-	}
+		for (int j = 0; j < src.width(); j++)
+		{
+			target(j, i, 0, 0) = src(j, i, 0, 0);
+			target(j, i, 0, 1) = src(j, i, 0, 1);
+			target(j, i, 0, 2) = src(j, i, 0, 2);
+		}
 	}
 }
 
@@ -474,9 +411,9 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 			new_coordinates = transformation_matrix * old_coordinates;
 
 			if ((new_coordinates(0, 0) >= (mp.x2 - limit)
-					&& new_coordinates(0, 0) <= (mp.x2 + limit))
+						&& new_coordinates(0, 0) <= (mp.x2 + limit))
 					&& (new_coordinates(0, 1) >= (mp.y2 - limit)
-							&& new_coordinates(0, 1) <= (mp.y2 + limit))) {
+						&& new_coordinates(0, 1) <= (mp.y2 + limit))) {
 				inliners++;
 			}
 		}
@@ -521,7 +458,7 @@ CImg<double> compute_ransac(const std::vector<MappedCoordinates>& input) {
 
 int main(int argc, char **argv)
 {
-	return temp();
+	//return temp();
 	try {
 		if(argc < 2)
 		{
@@ -564,10 +501,8 @@ int main(int argc, char **argv)
 			for(int i=3; i<argc; i++)
 			{
 				CImg<double> img(argv[i]);
-				Image I;
-				I.setParameters(argv[i], sift_matching(input, img, part));
-				images.push_back(I);
-			}
+				images.push_back(Image(argv[i], sift_matching(input, img, part)));
+			} 
 
 			// sort according to the sift match count
 			std::sort(images.begin(), images.end());
@@ -583,20 +518,20 @@ int main(int argc, char **argv)
 
 		else if (part == "part1.4") {
 
-				string inputFile = argv[2];
-				CImg<double> input_image(inputFile.c_str());
+			string inputFile = argv[2];
+			CImg<double> input_image(inputFile.c_str());
 
-				CImg<double> gray = input_image.get_RGBtoHSI().get_channel(2);
-				vector<SiftDescriptor> descriptors = Sift::compute_sift(gray);
+			CImg<double> gray = input_image.get_RGBtoHSI().get_channel(2);
+			vector<SiftDescriptor> descriptors = Sift::compute_sift(gray);
 
-				list< pair<double, int> > ordered; // ( (dist, index), ... )
+			list< pair<double, int> > ordered; // ( (dist, index), ... )
 
-				vector< CImg<double> > targets;
-				vector< vector< SiftDescriptor > > desc_records;
-				vector< vector< pair< int, int > > > all_pic_pairs;
-				const int first_target_i = 2;
-				for (int nfile = first_target_i; nfile < argc; nfile ++)
-				{
+			vector< CImg<double> > targets;
+			vector< vector< SiftDescriptor > > desc_records;
+			vector< vector< pair< int, int > > > all_pic_pairs;
+			const int first_target_i = 2;
+			for (int nfile = first_target_i; nfile < argc; nfile ++)
+			{
 				targets.push_back(CImg<double>(argv[nfile]));
 				CImg<double> &target_image = targets.back();
 
@@ -615,39 +550,39 @@ int main(int argc, char **argv)
 				list< pair<double, int> >::iterator lsit;
 				for (lsit = ordered.begin(); lsit != ordered.end(); lsit++)
 				{
-				if (lsit->first >= distance)
-				{
-				break;
-				}
+					if (lsit->first >= distance)
+					{
+						break;
+					}
 				}
 				printf("argv[%d] : %f\n", nfile, distance);
 
 				//target_image()
 
 				ordered.insert(lsit, pair<double, int>(distance, nfile - first_target_i));
-				}
+			}
 
-				for (list<pair<double, int> >::iterator it = ordered.begin();
+			for (list<pair<double, int> >::iterator it = ordered.begin();
 					it != ordered.end(); it++)
-					{
-					int ind = it->second;
-					printf("%s\n", argv[ind + first_target_i]);
+			{
+				int ind = it->second;
+				printf("%s\n", argv[ind + first_target_i]);
 
-					CImg<double> &target_image = targets[ind];
+				CImg<double> &target_image = targets[ind];
 
-					vector< pair<int, int> > &pairs = all_pic_pairs[ind];
+				vector< pair<int, int> > &pairs = all_pic_pairs[ind];
 
-					gray = target_image.get_RGBtoHSI().get_channel(2);
-					//vector<SiftDescriptor> target_descriptors = Sift::compute_sift(gray);
-					vector<SiftDescriptor> &target_descriptors = desc_records[ind];
+				gray = target_image.get_RGBtoHSI().get_channel(2);
+				//vector<SiftDescriptor> target_descriptors = Sift::compute_sift(gray);
+				vector<SiftDescriptor> &target_descriptors = desc_records[ind];
 
-					//double distance = sift_matching_with_random_vecotr(descriptors, target_descriptors, rand_mat, pairs);
+				//double distance = sift_matching_with_random_vecotr(descriptors, target_descriptors, rand_mat, pairs);
 
-					CImg<double> paired = stack_image(input_image, target_image);
+				CImg<double> paired = stack_image(input_image, target_image);
 
-					const unsigned char color[] = { 255,128,64 };
-					for (int i = 0; i < pairs.size(); i++)
-					{
+				const unsigned char color[] = { 255,128,64 };
+				for (int i = 0; i < pairs.size(); i++)
+				{
 					int x1 = descriptors[pairs[i].first].col;
 					int y1 = descriptors[pairs[i].first].row;
 					int x2 = target_descriptors[pairs[i].second].col;
@@ -655,16 +590,16 @@ int main(int argc, char **argv)
 					//printf("%d %d, %d %d\n", x1, y1, x2, y2);
 					x2 += input_image.width();
 					paired.draw_line(x1, y1, x2, y2, color);
-					}
+				}
 
-					CImgDisplay pair_disp(paired, "PAIRED");
-					while (!pair_disp.is_closed())
-					{
+				CImgDisplay pair_disp(paired, "PAIRED");
+				while (!pair_disp.is_closed())
+				{
 					pair_disp.wait();
-					}
+				}
 
-					paired.save("paired.png");
-					}
+				paired.save("paired.png");
+			}
 
 		}
 		else if(part == "part2")
