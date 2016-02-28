@@ -364,6 +364,8 @@ int main(int argc, char **argv)
 			SiftMatcher matcher(config);
 			for(int i=3; i<argc; i++)
 			{
+				if (std::string(argv[i]) == std::string(argv[2]))
+					continue;
 				std::cout<<"Processing: "<<argv[i]<<std::endl;
 				CImg<double> img(argv[i]);
 				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
