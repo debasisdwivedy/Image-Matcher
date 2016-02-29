@@ -55,7 +55,18 @@ int main(int argc, char **argv)
 		string part = argv[1];
 		
 		// Sift detector
-		if(!part.compare(0, 5,"part1")) {
+		if (part == "sift") {
+			if (argc < 4) {
+				std::cout<<"Insufficent number of arguments."<<std::endl;
+				return -1;
+			}
+			config.set("SiftMatcher.savelines", "1");
+			CImg<double> img1(argv[2]), img2(argv[3]);
+			SiftMatcher matcher(config);
+			std::vector<std::pair<SiftDescriptor, SiftDescriptor> > res = matcher.match(img1, img2);
+			std::cout<<" ["<<res.size()<<" matches]"<<std::endl;
+			img_display(CImg<double>("sift.png"));
+		} else if(!part.compare(0, 5,"part1")) {
 			if(argc < 4) {
 				cout << "Insufficent number of arguments." << endl;
 				return -1;
@@ -109,7 +120,7 @@ int main(int argc, char **argv)
 				mat.print();
 				Transformation t(mat);
 				CImg<double> transformed_image(transform_image(img, t));
-				transformed_image.save(("warped-" + std::string(argv[i]) + ".png").c_str());
+				transformed_image.save((std::string(argv[i]) + "-warped.png").c_str());
 			}
 		}
 		else

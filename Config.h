@@ -24,6 +24,10 @@ public:
 		ss>>ret;
 		return ret;
 	}
+
+	void set(const std::string& a, const std::string& b) {
+		map[a] = b;
+	}
 };
 
 #endif
