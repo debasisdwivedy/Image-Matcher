@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 		string part = argv[1];
 		
 		// Sift detector
-		if(part == "part1") {
+		if(!part.compare(0, 5,"part1")) {
 			if(argc < 4) {
 				cout << "Insufficent number of arguments." << endl;
 				return -1;
