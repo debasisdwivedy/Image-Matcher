@@ -1,0 +1,6 @@
+Loaded Config: SiftMatcher.max_dist=50
+Loaded Config: SiftMatcher.savejoined=1
+Loaded Config: SiftMatcher.savelines=1
+Loaded Config: SiftMatcher.dist_ratio=0.8
+Loaded Config: ransac.max_dist=10
+Processing: a2-images/part1_images/bigben_10.jpg [232 matches]
