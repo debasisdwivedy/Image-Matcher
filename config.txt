@@ -4,7 +4,7 @@ SiftMatcher.savelines 1
 SiftMatcher.dist_ratio 0.8
 FastSiftMatcher.w 255
 FastSiftMatcher.k 10
-FastSiftMatcher.max_dist 50
+FastSiftMatcher.max_dist 5
 ransac.max_dist 10
 ransac.reqd_prob 0.99
 ransac.inlier_prob 0.5
