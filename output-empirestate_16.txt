@@ -1,0 +1,207 @@
+Loaded Config: SiftMatcher.max_dist=50
+Loaded Config: SiftMatcher.savejoined=1
+Loaded Config: SiftMatcher.savelines=1
+Loaded Config: SiftMatcher.dist_ratio=0.8
+Loaded Config: ransac.max_dist=10
+Processing: a2-images/part1_images/bigben_10.jpg [135 matches]
+Processing: a2-images/part1_images/bigben_12.jpg [157 matches]
+Processing: a2-images/part1_images/bigben_13.jpg [125 matches]
+Processing: a2-images/part1_images/bigben_14.jpg [156 matches]
+Processing: a2-images/part1_images/bigben_16.jpg [108 matches]
+Processing: a2-images/part1_images/bigben_2.jpg [101 matches]
+Processing: a2-images/part1_images/bigben_3.jpg [190 matches]
+Processing: a2-images/part1_images/bigben_6.jpg [164 matches]
+Processing: a2-images/part1_images/bigben_7.jpg [132 matches]
+Processing: a2-images/part1_images/bigben_8.jpg [187 matches]
+Processing: a2-images/part1_images/colosseum_11.jpg [116 matches]
+Processing: a2-images/part1_images/colosseum_12.jpg [136 matches]
+Processing: a2-images/part1_images/colosseum_13.jpg [117 matches]
+Processing: a2-images/part1_images/colosseum_15.jpg [136 matches]
+Processing: a2-images/part1_images/colosseum_18.jpg [134 matches]
+Processing: a2-images/part1_images/colosseum_3.jpg [121 matches]
+Processing: a2-images/part1_images/colosseum_4.jpg [88 matches]
+Processing: a2-images/part1_images/colosseum_5.jpg [110 matches]
+Processing: a2-images/part1_images/colosseum_6.jpg [108 matches]
+Processing: a2-images/part1_images/colosseum_8.jpg [112 matches]
+Processing: a2-images/part1_images/eiffel_15.jpg [115 matches]
+Processing: a2-images/part1_images/eiffel_18.jpg [101 matches]
+Processing: a2-images/part1_images/eiffel_19.jpg [116 matches]
+Processing: a2-images/part1_images/eiffel_1.jpg [112 matches]
+Processing: a2-images/part1_images/eiffel_22.jpg [151 matches]
+Processing: a2-images/part1_images/eiffel_2.jpg [125 matches]
+Processing: a2-images/part1_images/eiffel_3.jpg [92 matches]
+Processing: a2-images/part1_images/eiffel_5.jpg [111 matches]
+Processing: a2-images/part1_images/eiffel_6.jpg [117 matches]
+Processing: a2-images/part1_images/eiffel_7.jpg [89 matches]
+Processing: a2-images/part1_images/empirestate_10.jpg [129 matches]
+Processing: a2-images/part1_images/empirestate_12.jpg [140 matches]
+Processing: a2-images/part1_images/empirestate_14.jpg [139 matches]
+Processing: a2-images/part1_images/empirestate_15.jpg [125 matches]
+Processing: a2-images/part1_images/empirestate_16.jpg [1669 matches]
+Processing: a2-images/part1_images/empirestate_22.jpg [186 matches]
+Processing: a2-images/part1_images/empirestate_23.jpg [129 matches]
+Processing: a2-images/part1_images/empirestate_25.jpg [101 matches]
+Processing: a2-images/part1_images/empirestate_27.jpg [126 matches]
+Processing: a2-images/part1_images/empirestate_9.jpg [121 matches]
+Processing: a2-images/part1_images/londoneye_12.jpg [133 matches]
+Processing: a2-images/part1_images/londoneye_13.jpg [137 matches]
+Processing: a2-images/part1_images/londoneye_16.jpg [130 matches]
+Processing: a2-images/part1_images/londoneye_17.jpg [115 matches]
+Processing: a2-images/part1_images/londoneye_21.jpg [121 matches]
+Processing: a2-images/part1_images/londoneye_22.jpg [123 matches]
+Processing: a2-images/part1_images/londoneye_23.jpg [117 matches]
+Processing: a2-images/part1_images/londoneye_2.jpg [98 matches]
+Processing: a2-images/part1_images/londoneye_8.jpg [124 matches]
+Processing: a2-images/part1_images/londoneye_9.jpg [136 matches]
+Processing: a2-images/part1_images/louvre_10.jpg [101 matches]
+Processing: a2-images/part1_images/louvre_11.jpg [154 matches]
+Processing: a2-images/part1_images/louvre_13.jpg [132 matches]
+Processing: a2-images/part1_images/louvre_14.jpg [118 matches]
+Processing: a2-images/part1_images/louvre_15.jpg [95 matches]
+Processing: a2-images/part1_images/louvre_16.jpg [101 matches]
+Processing: a2-images/part1_images/louvre_3.jpg [87 matches]
+Processing: a2-images/part1_images/louvre_4.jpg [106 matches]
+Processing: a2-images/part1_images/louvre_8.jpg [119 matches]
+Processing: a2-images/part1_images/louvre_9.jpg [91 matches]
+Processing: a2-images/part1_images/notredame_14.jpg [138 matches]
+Processing: a2-images/part1_images/notredame_19.jpg [202 matches]
+Processing: a2-images/part1_images/notredame_1.jpg [111 matches]
+Processing: a2-images/part1_images/notredame_20.jpg [127 matches]
+Processing: a2-images/part1_images/notredame_24.jpg [132 matches]
+Processing: a2-images/part1_images/notredame_25.jpg [126 matches]
+Processing: a2-images/part1_images/notredame_3.jpg [95 matches]
+Processing: a2-images/part1_images/notredame_4.jpg [102 matches]
+Processing: a2-images/part1_images/notredame_5.jpg [151 matches]
+Processing: a2-images/part1_images/notredame_8.jpg [119 matches]
+Processing: a2-images/part1_images/sanmarco_13.jpg [151 matches]
+Processing: a2-images/part1_images/sanmarco_14.jpg [102 matches]
+Processing: a2-images/part1_images/sanmarco_18.jpg [116 matches]
+Processing: a2-images/part1_images/sanmarco_19.jpg [121 matches]
+Processing: a2-images/part1_images/sanmarco_1.jpg [127 matches]
+Processing: a2-images/part1_images/sanmarco_20.jpg [131 matches]
+Processing: a2-images/part1_images/sanmarco_22.jpg [141 matches]
+Processing: a2-images/part1_images/sanmarco_3.jpg [137 matches]
+Processing: a2-images/part1_images/sanmarco_4.jpg [126 matches]
+Processing: a2-images/part1_images/sanmarco_5.jpg [144 matches]
+Processing: a2-images/part1_images/tatemodern_11.jpg [108 matches]
+Processing: a2-images/part1_images/tatemodern_13.jpg [118 matches]
+Processing: a2-images/part1_images/tatemodern_14.jpg [119 matches]
+Processing: a2-images/part1_images/tatemodern_16.jpg [153 matches]
+Processing: a2-images/part1_images/tatemodern_24.jpg [122 matches]
+Processing: a2-images/part1_images/tatemodern_2.jpg [151 matches]
+Processing: a2-images/part1_images/tatemodern_4.jpg [227 matches]
+Processing: a2-images/part1_images/tatemodern_6.jpg [163 matches]
+Processing: a2-images/part1_images/tatemodern_8.jpg [171 matches]
+Processing: a2-images/part1_images/tatemodern_9.jpg [166 matches]
+Processing: a2-images/part1_images/trafalgarsquare_15.jpg [156 matches]
+Processing: a2-images/part1_images/trafalgarsquare_16.jpg [123 matches]
+Processing: a2-images/part1_images/trafalgarsquare_1.jpg [123 matches]
+Processing: a2-images/part1_images/trafalgarsquare_20.jpg [165 matches]
+Processing: a2-images/part1_images/trafalgarsquare_21.jpg [112 matches]
+Processing: a2-images/part1_images/trafalgarsquare_22.jpg [127 matches]
+Processing: a2-images/part1_images/trafalgarsquare_25.jpg [128 matches]
+Processing: a2-images/part1_images/trafalgarsquare_5.jpg [171 matches]
+Processing: a2-images/part1_images/trafalgarsquare_6.jpg [141 matches]
+Processing: a2-images/part1_images/trafalgarsquare_8.jpg [120 matches]
+Top matches for Input Image: a2-images/part1_images/empirestate_16.jpg
+                                       Image Name:   Count: 
+         a2-images/part1_images/empirestate_16.jpg      1669
+           a2-images/part1_images/tatemodern_4.jpg       227
+           a2-images/part1_images/notredame_19.jpg       202
+               a2-images/part1_images/bigben_3.jpg       190
+               a2-images/part1_images/bigben_8.jpg       187
+         a2-images/part1_images/empirestate_22.jpg       186
+           a2-images/part1_images/tatemodern_8.jpg       171
+      a2-images/part1_images/trafalgarsquare_5.jpg       171
+           a2-images/part1_images/tatemodern_9.jpg       166
+     a2-images/part1_images/trafalgarsquare_20.jpg       165
+               a2-images/part1_images/bigben_6.jpg       164
+           a2-images/part1_images/tatemodern_6.jpg       163
+              a2-images/part1_images/bigben_12.jpg       157
+              a2-images/part1_images/bigben_14.jpg       156
+     a2-images/part1_images/trafalgarsquare_15.jpg       156
+              a2-images/part1_images/louvre_11.jpg       154
+          a2-images/part1_images/tatemodern_16.jpg       153
+            a2-images/part1_images/notredame_5.jpg       151
+            a2-images/part1_images/sanmarco_13.jpg       151
+           a2-images/part1_images/tatemodern_2.jpg       151
+              a2-images/part1_images/eiffel_22.jpg       151
+             a2-images/part1_images/sanmarco_5.jpg       144
+      a2-images/part1_images/trafalgarsquare_6.jpg       141
+            a2-images/part1_images/sanmarco_22.jpg       141
+         a2-images/part1_images/empirestate_12.jpg       140
+         a2-images/part1_images/empirestate_14.jpg       139
+           a2-images/part1_images/notredame_14.jpg       138
+             a2-images/part1_images/sanmarco_3.jpg       137
+           a2-images/part1_images/londoneye_13.jpg       137
+           a2-images/part1_images/colosseum_12.jpg       136
+            a2-images/part1_images/londoneye_9.jpg       136
+           a2-images/part1_images/colosseum_15.jpg       136
+              a2-images/part1_images/bigben_10.jpg       135
+           a2-images/part1_images/colosseum_18.jpg       134
+           a2-images/part1_images/londoneye_12.jpg       133
+              a2-images/part1_images/louvre_13.jpg       132
+           a2-images/part1_images/notredame_24.jpg       132
+               a2-images/part1_images/bigben_7.jpg       132
+            a2-images/part1_images/sanmarco_20.jpg       131
+           a2-images/part1_images/londoneye_16.jpg       130
+         a2-images/part1_images/empirestate_23.jpg       129
+         a2-images/part1_images/empirestate_10.jpg       129
+     a2-images/part1_images/trafalgarsquare_25.jpg       128
+             a2-images/part1_images/sanmarco_1.jpg       127
+           a2-images/part1_images/notredame_20.jpg       127
+     a2-images/part1_images/trafalgarsquare_22.jpg       127
+             a2-images/part1_images/sanmarco_4.jpg       126
+           a2-images/part1_images/notredame_25.jpg       126
+         a2-images/part1_images/empirestate_27.jpg       126
+               a2-images/part1_images/eiffel_2.jpg       125
+         a2-images/part1_images/empirestate_15.jpg       125
+              a2-images/part1_images/bigben_13.jpg       125
+            a2-images/part1_images/londoneye_8.jpg       124
+      a2-images/part1_images/trafalgarsquare_1.jpg       123
+     a2-images/part1_images/trafalgarsquare_16.jpg       123
+           a2-images/part1_images/londoneye_22.jpg       123
+          a2-images/part1_images/tatemodern_24.jpg       122
+            a2-images/part1_images/sanmarco_19.jpg       121
+           a2-images/part1_images/londoneye_21.jpg       121
+          a2-images/part1_images/empirestate_9.jpg       121
+            a2-images/part1_images/colosseum_3.jpg       121
+      a2-images/part1_images/trafalgarsquare_8.jpg       120
+          a2-images/part1_images/tatemodern_14.jpg       119
+               a2-images/part1_images/louvre_8.jpg       119
+            a2-images/part1_images/notredame_8.jpg       119
+          a2-images/part1_images/tatemodern_13.jpg       118
+              a2-images/part1_images/louvre_14.jpg       118
+           a2-images/part1_images/colosseum_13.jpg       117
+               a2-images/part1_images/eiffel_6.jpg       117
+           a2-images/part1_images/londoneye_23.jpg       117
+            a2-images/part1_images/sanmarco_18.jpg       116
+              a2-images/part1_images/eiffel_19.jpg       116
+           a2-images/part1_images/colosseum_11.jpg       116
+              a2-images/part1_images/eiffel_15.jpg       115
+           a2-images/part1_images/londoneye_17.jpg       115
+            a2-images/part1_images/colosseum_8.jpg       112
+               a2-images/part1_images/eiffel_1.jpg       112
+     a2-images/part1_images/trafalgarsquare_21.jpg       112
+               a2-images/part1_images/eiffel_5.jpg       111
+            a2-images/part1_images/notredame_1.jpg       111
+            a2-images/part1_images/colosseum_5.jpg       110
+              a2-images/part1_images/bigben_16.jpg       108
+            a2-images/part1_images/colosseum_6.jpg       108
+          a2-images/part1_images/tatemodern_11.jpg       108
+               a2-images/part1_images/louvre_4.jpg       106
+            a2-images/part1_images/sanmarco_14.jpg       102
+            a2-images/part1_images/notredame_4.jpg       102
+              a2-images/part1_images/louvre_10.jpg       101
+              a2-images/part1_images/eiffel_18.jpg       101
+              a2-images/part1_images/louvre_16.jpg       101
+         a2-images/part1_images/empirestate_25.jpg       101
+               a2-images/part1_images/bigben_2.jpg       101
+            a2-images/part1_images/londoneye_2.jpg        98
+              a2-images/part1_images/louvre_15.jpg        95
+            a2-images/part1_images/notredame_3.jpg        95
+               a2-images/part1_images/eiffel_3.jpg        92
+               a2-images/part1_images/louvre_9.jpg        91
+               a2-images/part1_images/eiffel_7.jpg        89
+            a2-images/part1_images/colosseum_4.jpg        88
+               a2-images/part1_images/louvre_3.jpg        87
