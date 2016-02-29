@@ -79,6 +79,7 @@ cimg_library::CImg<T> transform_image(const cimg_library::CImg<T>& img, Transfor
 								std::min(updated[2].second, updated[3].second));
 
 	double widthMapped = rightMost - leftMost, heightMapped = topMost - bottomMost; */
+	(void)updated;
 	Transformation inverse = t.inverse();
 	//cimg_library::CImg<T> result(widthMapped, heightMapped, 1, img.spectrum(),0);
 	cimg_library::CImg<T> result(img.width(), img.height(), 1, img.spectrum(),0);

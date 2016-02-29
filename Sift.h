@@ -35,7 +35,7 @@ class Sift
       
       vector<SiftDescriptor> descriptors;
 
-      typedef vector<pair<VL::Sift::Keypoint,VL::float_t> > Keypoints ;
+      //typedef vector<pair<VL::Sift::Keypoint,VL::float_t> > Keypoints ;
 
       //      if(lowe_compatible)
       //	luma /= 255.0;

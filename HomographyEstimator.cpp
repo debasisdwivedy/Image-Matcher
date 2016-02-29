@@ -15,6 +15,7 @@ namespace {
 		}
 		return result;
 	}
+#if 0
 	void print(CImg<double> mat) {
 		for (int i=0; i<mat.height(); i++) {
 			for (int j=0; j<mat.width(); j++) {
@@ -23,6 +24,8 @@ namespace {
 			std::cout<<std::endl;
 		}
 	}
+#endif
+
 	std::pair<CImg<double>, CImg<double> > get_matrix(MappedCoordinates input[4]) {
 #if 0
 		std::cout<<input[0].x1<<", "<<input[0].y1<<" => "<<input[0].x2<<", "<<input[0].y2<<std::endl;
