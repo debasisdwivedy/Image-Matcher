@@ -13,7 +13,6 @@ SiftMatcher::~SiftMatcher() {
 
 std::vector<std::pair<SiftDescriptor, SiftDescriptor> > SiftMatcher::match(
 		const CImg<double>& input1, const CImg<double>& input2) const {
-	double sift_distance_threshold = config.get<double>("SiftMatcher.max_dist");
 	const unsigned char color[] = {0, 255, 0};
 
 	CImg<double> greyScale1 = input1.spectrum() == 1? input1:input1.get_RGBtoHSI().get_channel(2);
@@ -35,24 +34,24 @@ std::vector<std::pair<SiftDescriptor, SiftDescriptor> > SiftMatcher::match(
 	double dist_ratio = config.get<double>("SiftMatcher.dist_ratio");
 	std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result;
 	for(size_t i = 0; i < desc1.size(); i++) {
-		double closestIndex=0, secondClosestIndex=0;
+		double closestIndex=0;
 		double closestDist = std::numeric_limits<double>::infinity(),
 			   secondClosestDist = std::numeric_limits<double>::infinity();
-		for(size_t j = 0; j < desc2.size(); j++) {
-			double distance = descriptor_distance(desc1[i], desc2[j]);
+		std::vector<SiftDescriptor> compare(get_comparables(desc1[i], desc2));
+		for(size_t j = 0; j < compare.size(); j++) {
+			double distance = descriptor_distance(desc1[i], compare[j]);
 
 			if(distance < closestDist) {
 				secondClosestDist = closestDist;
-				secondClosestIndex = closestIndex;
 				closestDist = distance;
 				closestIndex = j;
 			}
 		}
 		if (closestDist/secondClosestDist < dist_ratio) {
 			output.draw_line(desc1[i].col, desc1[i].row, 
-				desc2[closestIndex].col + input1.width(), desc2[closestIndex].row, color);
+				compare[closestIndex].col + input1.width(), compare[closestIndex].row, color);
 
-			result.push_back(std::make_pair(desc1[i], desc2[closestIndex]));
+			result.push_back(std::make_pair(desc1[i], compare[closestIndex]));
 		}
 	}
 
@@ -62,6 +61,12 @@ std::vector<std::pair<SiftDescriptor, SiftDescriptor> > SiftMatcher::match(
 	}
 
 	return result;
+}
+
+std::vector<SiftDescriptor> SiftMatcher::get_comparables(
+				const SiftDescriptor& desc1,
+				const std::vector<SiftDescriptor>& desc2) const {
+	return desc2;
 }
 
 
@@ -87,7 +92,7 @@ cimg_library::CImg<double> annotate_sift_points(const CImg<double>& image, const
 		for(size_t j=0; j<5; j++) {
 			for(size_t k=0; k<5; k++) {
 				if(j==2 || k==2) {
-					for(size_t p=0; p<result.spectrum(); p++) {
+					for(int p=0; p<result.spectrum(); p++) {
 						if(descriptors[i].col+k < result.width() && 
 									descriptors[i].row+j < result.height()) {
 							result(descriptors[i].col+k, descriptors[i].row+j, 0, p)=0;

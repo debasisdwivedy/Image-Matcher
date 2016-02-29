@@ -9,14 +9,20 @@
 #include "Sift.h"
 
 class SiftMatcher {
+protected:
 	const Config& config;
 
+	std::vector<SiftDescriptor> get_comparables(
+			const SiftDescriptor&,
+			const std::vector<SiftDescriptor>&) const;
 public:
 	SiftMatcher(const Config&);
 	virtual ~SiftMatcher();
 	
 	std::vector<std::pair<SiftDescriptor, SiftDescriptor> > match(
 			const cimg_library::CImg<double>&, const CImg<double>&) const;
+
+	
 };
 
 double descriptor_distance(const SiftDescriptor&, const SiftDescriptor&);
