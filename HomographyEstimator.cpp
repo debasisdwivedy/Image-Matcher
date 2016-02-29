@@ -146,7 +146,11 @@ namespace {
 }
 
 SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const Config& config) {
-	int trial_count = 500;
+	double ransac_reqd_prob = config.get<double>("ransac.reqd_prob");
+	double ransac_prob_inliner = config.get<double>("ransac.inlier_prob");
+	// ln(1 - p)/ln(1-(1-e)^s) >= N
+	int trial_count = 1 + std::log(1-ransac_reqd_prob) / std::log(1-std::pow(1-ransac_prob_inliner, 4));
+	std::cout<<"Running "<<trial_count<<" trials."<<std::endl;
 	std::pair<int, SqMatrix> best(-1, SqMatrix(3));
 	for (int i=0; i<trial_count; i++) {
 		std::cout<<"Trial #"<<i<<": ";
@@ -163,3 +167,4 @@ SqMatrix estimate_homography(const std::vector<MappedCoordinates>& input, const 
 
 	return best.second;
 }
+
