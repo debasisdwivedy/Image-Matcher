@@ -367,8 +367,6 @@ int main(int argc, char **argv)
 			SiftMatcher matcher(config);
 			for(int i=3; i<argc; i++)
 			{
-				if (std::string(argv[i]) == std::string(argv[2]))
-					continue;
 				std::cout<<"Processing: "<<argv[i];
 				CImg<double> img(argv[i]);
 				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
@@ -380,8 +378,8 @@ int main(int argc, char **argv)
 			std::sort(matchResult.begin(), matchResult.end(), std::greater<ImageMatchResult>());
 
 			// printing the results
-			cout<<"Top matches for Input Image: "<<argv[2]<<endl<<std::setw(50)<<"Image Name:"<<setw(10)<<"Count: "<<endl;
-			for(size_t i = 0; i < matchResult.size(); i++) {
+			cout<<"Top 10 matches for Input Image: "<<argv[2]<<endl<<std::setw(50)<<"Image Name:"<<setw(10)<<"Count: "<<endl;
+			for(size_t i = 0; i < matchResult.size() && i < 10; i++) {
 				std::cout<<std::setw(50)<<matchResult[i].getName()<<std::setw(10)<<matchResult[i].getCount()<<std::endl;
 			}
 
