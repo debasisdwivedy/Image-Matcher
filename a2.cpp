@@ -351,9 +351,9 @@ int main(int argc, char **argv)
 		}
 
 		string part = argv[1];
-
+		
 		// Sift detector
-		if(!part.compare(0, 5,"part1")) {
+		if(part == "part1") {
 			if(argc < 4) {
 				cout << "Insufficent number of arguments." << endl;
 				return -1;
@@ -386,7 +386,6 @@ int main(int argc, char **argv)
 		}
 
 		else if (part == "part1.4") {
-
 			string inputFile = argv[2];
 			CImg<double> input_image(inputFile.c_str());
 
