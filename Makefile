@@ -15,10 +15,10 @@ LDFLAGS =
 LIBS = -lX11 -lpthread
 
 # Define Compile Flags
-COMPILEFLAGS = -Wall -g
+COMPILEFLAGS = -Wall
 
 # Define Link Flags
-LINKFLAGS = -g
+LINKFLAGS =
 
 # Do not make any changes below!
 OBJS      = $(SRCS:.cpp=.o)

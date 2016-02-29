@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 				mat.print();
 				Transformation t(mat);
 				CImg<double> transformed_image(transform_image(img, t));
-				transformed_image.save(("warped-" + std::string(argv[i])).c_str());
+				transformed_image.save(("warped-" + std::string(argv[i]) + ".png").c_str());
 			}
 		}
 		else
