@@ -484,12 +484,11 @@ int main(int argc, char **argv)
 			for(int i=3; i<argc; i++) {
 				std::cout<<"Processing: "<<argv[i]<<std::endl;
 				CImg<double> img(argv[i]);
-				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(query, img));
+				std::vector<std::pair<SiftDescriptor, SiftDescriptor> > result(matcher.match(img, query));
 				std::vector<MappedCoordinates> mapped;
 				for (int j=0; j<result.size(); j++) {
 					mapped.push_back(getMappedCoordinate(result[j]));
 				}
-				//std::transform(result.begin(), result.end(), mapped.begin(), getMappedCoordinate);
 				SqMatrix mat(estimate_homography(mapped, config));
 				std::cout<<"Transformation Matrix:\n"<<std::endl;
 				mat.print();
